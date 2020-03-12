@@ -1,2 +1,2 @@
-# jetbot_cadrl
-Running CADRL on Jetbot with Gazebo simulation
+# Jetbot CADRL
+Running CADRL_ROS on Jetbot with Gazebo simulation
