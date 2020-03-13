@@ -131,3 +131,6 @@ dmypy.json
 # Catkin
 build/
 devel/
+
+.idea
+.gitmodules
