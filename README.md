@@ -8,7 +8,7 @@ Running CADRL_ROS on Jetbot with Gazebo simulation
 4. Deploy models onto Jebot. 
 
 ## Env
-    sudo apt-get install python-pip ros-melodic-ros-control ros-melodic-ros-controllers
+    sudo apt-get install python-pip ros-melodic-ros-control ros-melodic-ros-controllers ros-melodic-joint-state-publisher-gui
     pip2 install imageio==2.6.1
     pip2 install tensorflow-gpu==1.14.0 keras==2.3.1
     pip2 install cvlib --no-deps
