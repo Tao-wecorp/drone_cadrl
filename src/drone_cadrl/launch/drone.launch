@@ -8,4 +8,7 @@
 
     <param name="robot_description" textfile="$(find sjtu_drone)/models/sjtu_drone/sjtu_drone.urdf" />
     <node name="spawn_model" pkg="sjtu_drone" type="spawn_model" respawn="false" />
+
+    <rosparam command="load" file="$(find drone_cadrl)/config/q.yaml" />
+    <!-- <node pkg="drone_cadrl" name="gym_train" type="training.py" output="screen"/> -->
 </launch>
