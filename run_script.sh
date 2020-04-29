@@ -1,4 +1,4 @@
 #!/bin/bash
 
 source devel/setup.bash
-rosrun drone_ai track_pose_knn.py
+rosrun drone_cadrl yaw_kp.py
