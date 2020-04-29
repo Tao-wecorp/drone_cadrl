@@ -1,4 +1,4 @@
 #!/bin/bash
 
 source devel/setup.bash
-roslaunch drone_cadrl drone.launch
+roslaunch drone_openai drone.launch
