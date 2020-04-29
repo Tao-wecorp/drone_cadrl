@@ -1,0 +1,4 @@
+{
+    "python.pythonPath": "/home/robotics/.virtualenvs/py3venv/bin/python",
+    "python.linting.enabled": false
+}

@@ -132,5 +132,10 @@ dmypy.json
 build/
 devel/
 
-.idea
-.gitmodules
+# ROS
+.idea/
+.catkin_workspace/
+
+# models
+*.prototxt
+*.caffemodel
