@@ -41,15 +41,10 @@ class Detect(object):
                 frame = deepcopy(self.frame)
                 current_yaw = deepcopy(self.current_yaw)
                 
-                bboxes, indices = detection.detect(frame)
+                centroids = detection.detect(frame)
 
-                for i in indices:
-                    i = i[0]
-                    bbox = bboxes[i]
-                    x1, y1, x2, y2 = bbox
-                    cent_x = x1 + (x2-x1)/2
-                    cent_y = y1 + (y2-y1)/2
-                    cv2.circle(frame, (int(cent_x), int(cent_y)), 3, [0,0,255], -1, cv2.LINE_AA)
+                for cent in centroids:
+                    cv2.circle(frame, (cent[0], cent[1]), 3, [0,0,255], -1, cv2.LINE_AA)
                 cv2.imshow("", frame)
                 cv2.waitKey(1)
                 
