@@ -8,7 +8,6 @@ import tf
 import time
 from gym import utils, spaces
 from geometry_msgs.msg import Twist, Vector3Stamped, Pose
-from hector_uav_msgs.msg import Altimeter
 from sensor_msgs.msg import Imu
 from std_msgs.msg import Empty as EmptyTopicMsg
 from gym.utils import seeding
