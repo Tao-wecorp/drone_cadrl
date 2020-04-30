@@ -47,7 +47,7 @@ class Detect(object):
                     cv2.circle(frame, (cent[0], cent[1]), 3, [0,0,255], -1, cv2.LINE_AA)
                 cv2.imshow("", frame)
                 cv2.waitKey(1)
-                
+                 
                 print("%s seconds" % (time.time() - start_time))
 
             self.rate.sleep()

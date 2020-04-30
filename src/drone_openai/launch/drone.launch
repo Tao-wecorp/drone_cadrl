@@ -8,4 +8,8 @@
 
     <param name="robot_description" textfile="$(find sjtu_drone)/models/sjtu_drone/sjtu_drone.urdf" />
     <node name="spawn_model" pkg="sjtu_drone" type="spawn_model" respawn="false" />
+
+    <rosparam command="load" file="$(find drone_openai)/config/qlearn_params.yaml" />
+    <!-- <node name="training" pkg="drone_openai"   type="start_training.py" output="screen"/> -->
+    <!-- <node name="detection" pkg="drone_openai"  type="detect.py" output="screen"/> -->
 </launch>
