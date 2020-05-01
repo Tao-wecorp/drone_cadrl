@@ -12,6 +12,6 @@ desired_pose:
     y: 1.0
     z: 0.7
 max_altitude: 2.0   # in meters
-max_incl: 0.7       # in rads
+max_incl: 0.78       # in rads degree 45
 speed_value: 1.0    # in m/s
 running_step: 0.3   # in seconds

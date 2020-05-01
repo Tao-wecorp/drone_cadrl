@@ -10,7 +10,7 @@ import time
 import numpy
 import random
 import time
-from helpers.qlearning import QLearn
+from helpers.qlearning import QLearning
 from gym import wrappers
 
 # ROS packages required
@@ -49,9 +49,9 @@ if __name__ == '__main__':
     nsteps = rospy.get_param("/nsteps")
 
     # Initialises the algorithm that we are going to use for learning
-    qlearn = QLearn(actions=range(env.action_space.n),
+    qlearning = QLearning(actions=range(env.action_space.n),
                     alpha=Alpha, gamma=Gamma, epsilon=Epsilon)
-    initial_epsilon = qlearn.epsilon
+    initial_epsilon = qlearning.epsilon
 
     start_time = time.time()
     highest_reward = 0
@@ -62,8 +62,8 @@ if __name__ == '__main__':
         
         cumulated_reward = 0  
         done = False
-        if qlearn.epsilon > 0.05:
-            qlearn.epsilon *= epsilon_discount
+        if qlearning.epsilon > 0.05:
+            qlearning.epsilon *= epsilon_discount
         
         # Initialize the environment and get first state of the robot
         observation = env.reset()
@@ -76,7 +76,7 @@ if __name__ == '__main__':
         for i in range(nsteps):
 
             # Pick an action based on the current state
-            action = qlearn.chooseAction(state)
+            action = qlearning.chooseAction(state)
             
             # Execute the action in the environment and get feedback
             observation, reward, done, info = env.step(action)
@@ -87,7 +87,7 @@ if __name__ == '__main__':
             nextState = ''.join(map(str, observation))
 
             # Make the algorithm learn based on the results
-            qlearn.learn(state, action, reward, nextState)
+            qlearning.learn(state, action, reward, nextState)
 
             if not(done):
                 state = nextState
@@ -98,10 +98,10 @@ if __name__ == '__main__':
 
         m, s = divmod(int(time.time() - start_time), 60)
         h, m = divmod(m, 60)
-        rospy.loginfo ( ("EP: "+str(x+1)+" - [alpha: "+str(round(qlearn.alpha,2))+" - gamma: "+str(round(qlearn.gamma,2))+" - epsilon: "+str(round(qlearn.epsilon,2))+"] - Reward: "+str(cumulated_reward)+"     Time: %d:%02d:%02d" % (h, m, s)))
+        rospy.loginfo ( ("EP: "+str(x+1)+" - [alpha: "+str(round(qlearning.alpha,2))+" - gamma: "+str(round(qlearning.gamma,2))+" - epsilon: "+str(round(qlearning.epsilon,2))+"] - Reward: "+str(cumulated_reward)+"     Time: %d:%02d:%02d" % (h, m, s)))
 
     
-    rospy.loginfo ( ("\n|"+str(nepisodes)+"|"+str(qlearn.alpha)+"|"+str(qlearn.gamma)+"|"+str(initial_epsilon)+"*"+str(epsilon_discount)+"|"+str(highest_reward)+"| PICTURE |"))
+    rospy.loginfo ( ("\n|"+str(nepisodes)+"|"+str(qlearning.alpha)+"|"+str(qlearning.gamma)+"|"+str(initial_epsilon)+"*"+str(epsilon_discount)+"|"+str(highest_reward)+"| PICTURE |"))
 
     l = last_time_steps.tolist()
     l.sort()

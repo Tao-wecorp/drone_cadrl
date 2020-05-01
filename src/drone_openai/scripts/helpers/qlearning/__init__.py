@@ -1,1 +1,1 @@
-from .objects import QLearn
+from .objects import QLearning
