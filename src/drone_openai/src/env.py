@@ -12,7 +12,7 @@ from sensor_msgs.msg import Imu
 from std_msgs.msg import Empty as EmptyTopicMsg
 from gym.utils import seeding
 from gym.envs.registration import register
-from gazebo_connection import GazeboConnection
+from helpers.utils.gazebo_connection import GazeboConnection
 
 #register the training environment in the gym as an available one
 reg = register(

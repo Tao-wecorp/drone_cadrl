@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 '''
 Q-learning approach for different RL problems
 as part of the basic series on reinforcement learning @

@@ -10,7 +10,7 @@ import time
 import numpy
 import random
 import time
-import qlearning
+from helpers.qlearning import QLearn
 from gym import wrappers
 
 # ROS packages required
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     nsteps = rospy.get_param("/nsteps")
 
     # Initialises the algorithm that we are going to use for learning
-    qlearn = qlearning.QLearn(actions=range(env.action_space.n),
+    qlearn = QLearn(actions=range(env.action_space.n),
                     alpha=Alpha, gamma=Gamma, epsilon=Epsilon)
     initial_epsilon = qlearn.epsilon
 
