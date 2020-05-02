@@ -125,7 +125,9 @@ class QuadCopterEnv(gym.Env):
         state = [data_pose.position.x]
         return state, reward, done, {}
 
-
+    def _render(self, mode, close=True):
+        pass
+    
     def take_observation (self):
         data_pose = None
         while data_pose is None:
