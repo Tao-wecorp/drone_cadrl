@@ -4,7 +4,7 @@ gamma: 0.8
 epsilon: 0.9
 epsilon_discount: 0.999 # 1098 eps to reach 0.1
 nepisodes: 5
-nsteps: 100
+nsteps: 200
 
 # Environment Parameters
 desired_pose:

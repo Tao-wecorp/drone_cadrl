@@ -9,6 +9,7 @@ import rospkg
 
 import env
 import gym
+from gym import Wrapper
 from helpers.qlearning import QLearning
 
 
@@ -19,8 +20,8 @@ if __name__ == '__main__':
     # Set the logging system
     rospack = rospkg.RosPack()
     pkg_path = rospack.get_path('drone_openai')
-    outdir = pkg_path + '/training_results'
-    env = gym.wrappers.Monitor(env, outdir, force=True)
+    outdir = pkg_path + '/results'
+    env = Wrappers.Monitor(env, outdir, force=True)
 
     Alpha = rospy.get_param("/alpha")
     Epsilon = rospy.get_param("/epsilon")
@@ -65,6 +66,5 @@ if __name__ == '__main__':
                 break 
 
     l = last_time_steps.tolist()
-    l.sort()
     print(l)
     env.close()

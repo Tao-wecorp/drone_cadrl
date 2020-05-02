@@ -1,5 +1,5 @@
 #!/bin/bash
 
-cd /home/robotics/Workspace/drone_cadrl/src/drone_openai/src
+cd /home/robotics/Workspace/drone_openai/src/drone_openai/scripts
 chmod +x *.py
 cd ../../..
