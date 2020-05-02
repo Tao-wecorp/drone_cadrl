@@ -139,3 +139,7 @@ devel/
 # models
 *.prototxt
 *.caffemodel
+
+# results
+*.stats.json
+*.manifest.json

@@ -9,7 +9,6 @@ import rospkg
 
 import env
 import gym
-from gym import Wrapper
 from helpers.qlearning import QLearning
 
 
@@ -21,7 +20,7 @@ if __name__ == '__main__':
     rospack = rospkg.RosPack()
     pkg_path = rospack.get_path('drone_openai')
     outdir = pkg_path + '/results'
-    env = Wrappers.Monitor(env, outdir, force=True)
+    env = gym.wrappers.Monitor(env, outdir, force=True)
 
     Alpha = rospy.get_param("/alpha")
     Epsilon = rospy.get_param("/epsilon")
@@ -33,9 +32,8 @@ if __name__ == '__main__':
     qlearning = QLearning(actions=range(env.action_space.n), alpha=Alpha, gamma=Gamma, epsilon=Epsilon)
     initial_epsilon = qlearning.epsilon
 
-    start_time = time.time()
     highest_reward = 0
-    last_time_steps = numpy.ndarray(0)
+    final_steps = numpy.ndarray(0)
 
     for x in range(nepisodes):
         rospy.loginfo ("STARTING Episode #"+str(x))
@@ -54,7 +52,7 @@ if __name__ == '__main__':
             cumulated_reward += reward
             if highest_reward < cumulated_reward:
                 highest_reward = cumulated_reward
-
+            
             nextState = ''.join(map(str, observation))
             qlearning.learn(state, action, reward, nextState)
 
@@ -62,9 +60,7 @@ if __name__ == '__main__':
                 state = nextState
             else:
                 rospy.loginfo ("DONE")
-                last_time_steps = numpy.append(last_time_steps, [int(i + 1)])
+                final_steps = numpy.append(final_steps, [int(i + 1)])
                 break 
 
-    l = last_time_steps.tolist()
-    print(l)
     env.close()
