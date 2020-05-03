@@ -10,3 +10,9 @@
 [submodule "src/geometry2"]
 	path = src/geometry2
 	url = https://github.com/Tao-wecorp/geometry2
+[submodule "src/stable-baselines"]
+	path = src/stable-baselines
+	url = https://github.com/hill-a/stable-baselines
+[submodule "src/rl-baselines-zoo"]
+	path = src/rl-baselines-zoo
+	url = https://github.com/araffin/rl-baselines-zoo

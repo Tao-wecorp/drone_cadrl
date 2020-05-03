@@ -143,3 +143,6 @@ devel/
 # results
 *.stats.json
 *.manifest.json
+
+# Packt
+packt_gym/

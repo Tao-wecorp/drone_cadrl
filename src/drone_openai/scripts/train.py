@@ -52,6 +52,7 @@ if __name__ == '__main__':
             cumulated_reward += reward
             if highest_reward < cumulated_reward:
                 highest_reward = cumulated_reward
+            print(highest_reward)
             
             nextState = ''.join(map(str, observation))
             qlearning.learn(state, action, reward, nextState)
