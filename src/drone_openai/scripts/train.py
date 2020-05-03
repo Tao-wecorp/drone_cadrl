@@ -9,12 +9,17 @@ import rospkg
 
 import env
 import gym
+from gym.spaces import *
 from helpers.qlearning import QLearning
 
 
 if __name__ == '__main__':
     rospy.init_node('train_node', anonymous=True)
     env = gym.make("QuadcopterLiveShow-v0")
+    print("Observation Space:")
+    print_spaces(env.observation_space)
+    print("Action Space:")
+    print_spaces(env.action_space)
         
     # Set the logging system
     rospack = rospkg.RosPack()
