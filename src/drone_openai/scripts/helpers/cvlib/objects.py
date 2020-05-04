@@ -6,7 +6,7 @@ from math import *
 
 class Detection:
     def detect(self, cv_image):
-        bboxes, labels, conf = cv.detect_common_objects(cv_image, model='yolov3-tiny', enable_gpu=True)
+        bboxes, labels, conf = cv.detect_common_objects(cv_image, model='yolov3-tiny', enable_gpu=False)
         indices = cv2.dnn.NMSBoxes(bboxes, conf, score_threshold=0.8, nms_threshold=0.8)
 
         centroids = []

@@ -16,7 +16,7 @@ from helpers.utils.gazebo_connection import GazeboConnection
 
 #register the training environment in the gym as an available one
 reg = register(
-    id='QuadcopterLiveShow-v0',
+    id='QuadcopterYaw-v0',
     entry_point='env:QuadCopterEnv',
     max_episode_steps=100,
     )
