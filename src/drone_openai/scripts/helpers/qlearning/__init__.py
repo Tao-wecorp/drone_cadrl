@@ -1,1 +1,2 @@
-from .objects import QLearning
+from .qlearning import QLearning
+from .train import Training
