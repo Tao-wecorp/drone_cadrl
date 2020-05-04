@@ -15,7 +15,7 @@ from helpers.qlearning import QLearning
 
 if __name__ == '__main__':
     rospy.init_node('train_node', anonymous=True)
-    env_yaw = gym.make("QuadcopterYaw-v0")
+    env_yaw = gym.make("Yaw-v0")
         
     # Set the logging system
     rospack = rospkg.RosPack()
