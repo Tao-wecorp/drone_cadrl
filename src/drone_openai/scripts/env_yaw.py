@@ -6,27 +6,28 @@ import time
 import numpy as np
 import tf
 import time
-
-from geometry_msgs.msg import Twist, Pose
+from gym import utils, spaces
+from geometry_msgs.msg import Twist, Vector3Stamped, Pose
 from sensor_msgs.msg import Imu
 from std_msgs.msg import Empty as EmptyTopicMsg
-
-from gym import utils, spaces
 from gym.utils import seeding
 from gym.envs.registration import register
-
 from helpers.utils.gazebo_connection import GazeboConnection
 
+#register the training environment in the gym as an available one
 reg = register(
     id='Yaw-v0',
     entry_point='env_yaw:YawEnv',
-    max_episode_steps=100
+    max_episode_steps=1000,
     )
 
 
 class YawEnv(gym.Env):
 
     def __init__(self):
+        
+        # We assume that a ROS node has already been created
+        # before initialising the environment
         
         self.vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=5)
         self.takeoff_pub = rospy.Publisher('/drone/takeoff', EmptyTopicMsg, queue_size=0)
@@ -165,12 +166,12 @@ class YawEnv(gym.Env):
         rate = rospy.Rate(10) # 10hz
         while(self.takeoff_pub.get_num_connections() == 0):
             rospy.loginfo("No susbribers to Takeoff yet so we wait and try again")
-            rate.sleep();
+            rate.sleep()
         rospy.loginfo("Takeoff Publisher Connected")
 
         while(self.vel_pub.get_num_connections() == 0):
             rospy.loginfo("No susbribers to Cmd_vel yet so we wait and try again")
-            rate.sleep();
+            rate.sleep()
         rospy.loginfo("Cmd_vel Publisher Connected")
         
 

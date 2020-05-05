@@ -21,9 +21,6 @@ import time
 from helpers.cvlib import Detection
 detection = Detection()
 
-from helpers.qlearning import Training
-train = Training()
-
 from helpers.control import Control
 control = Control()
 fpv = [320, 480]
@@ -60,7 +57,7 @@ class Yaw(object):
                     yaw_angle = degrees(atan(float(fpv[0]-cent[0])/(fpv[1]-cent[1])))
                     yaw_angular_z = yaw_angle*pi/180 - current_yaw
 
-                    self.move_msg.angular.z = train.yaw(yaw_angular_z)
+                    self.move_msg.angular.z = kp * yaw_angular_z
                     self.pub_cmd_vel.publish(self.move_msg)
 
                     cv2.circle(frame, (320, cent[1]), 3, [0,0,255], -1, cv2.LINE_AA)
