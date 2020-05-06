@@ -14,7 +14,6 @@ from gym.utils import seeding
 from gym.envs.registration import register
 from helpers.utils.gazebo_connection import GazeboConnection
 
-#register the training environment in the gym as an available one
 reg = register(
     id='Yaw-v0',
     entry_point='env_yaw:YawEnv',
@@ -25,9 +24,6 @@ reg = register(
 class YawEnv(gym.Env):
 
     def __init__(self):
-        
-        # We assume that a ROS node has already been created
-        # before initialising the environment
         
         self.vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=5)
         self.takeoff_pub = rospy.Publisher('/drone/takeoff', EmptyTopicMsg, queue_size=0)
