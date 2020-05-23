@@ -89,7 +89,8 @@ def main():
         Yaw()
     except KeyboardInterrupt:
         pass
-    cv2.destroyAllWindows()
+    finally:
+        cv2.destroyAllWindows()
     
 
 if __name__ == '__main__':
