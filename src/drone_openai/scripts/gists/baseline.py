@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 import gym
 
-from stable_baselines import A2C
+from stable_baselines3 import A2C
 
 env = gym.make('CartPole-v1')
 
