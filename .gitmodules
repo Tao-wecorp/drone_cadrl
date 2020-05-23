@@ -16,3 +16,6 @@
 [submodule "src/rl-baselines-zoo"]
 	path = src/rl-baselines-zoo
 	url = https://github.com/araffin/rl-baselines-zoo
+[submodule "src/stable-baselines3"]
+	path = src/stable-baselines3
+	url = https://github.com/DLR-RM/stable-baselines3
