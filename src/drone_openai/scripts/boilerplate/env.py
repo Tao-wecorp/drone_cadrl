@@ -16,8 +16,7 @@ class GoLeftEnv(gym.Env):
 
     n_actions = 2
     self.action_space = spaces.Discrete(n_actions)
-    self.observation_space = spaces.Box(low=0, high=self.grid_size,
-                                        shape=(1,), dtype=np.float64)
+    self.observation_space = spaces.Box(low=0, high=self.grid_size, shape=(1,), dtype=np.float64)
 
   def reset(self):
     self.agent_pos = self.grid_size - 1
