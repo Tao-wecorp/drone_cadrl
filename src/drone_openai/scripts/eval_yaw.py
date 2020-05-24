@@ -5,12 +5,12 @@ gym.logger.set_level(40)
 import tensorflow as tf
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
-from env import GoLeftEnv
+import env_yaw
 from stable_baselines import DQN, PPO2, A2C, ACKTR
 from stable_baselines.common.cmd_util import make_vec_env
 from stable_baselines.common.evaluation import evaluate_policy
 
-env = GoLeftEnv(grid_size=10)
+env = gym.make("Yaw-v0")
 env = make_vec_env(lambda: env, n_envs=1)
 
 # model = ACKTR.load("models/acktr_goleft", env=env)
