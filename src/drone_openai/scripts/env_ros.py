@@ -25,48 +25,29 @@ reg = register(
 
 
 class YawEnv(gym.Env):
-    LEFT = 0
-    RIGHT = 1
-    FORWARD = 2
-    BACKWARD = 3
-    ACTIONS = [LEFT,RIGHT,FORWARD,BACKWARD]
 
     def __init__(self, grid_size=10):
         super(YawEnv, self).__init__()
 
         self.vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=5)
 
+        self.speed_value = 1.0
         self.desired_pose = Pose()
         self.desired_pose.position.z = 0
         self.desired_pose.position.x = 5
         self.desired_pose.position.y = 0
         
         self.running_step = 2
-        self.max_incl = 0.3
-        self.minx = -5
-        self.maxx = 5
-        self.miny = -5
-        self.maxy = 5
-        self.shape = (10,10)
-
-
-        self.horizontal_bins = np.zeros((2,self.shape[1]))
-        
-        self.horizontal_bins[0] = np.linspace(self.minx,self.maxx,self.shape[1])
-        self.horizontal_bins[1] = np.linspace(self.miny,self.maxy,self.shape[1])
-        self.goal = np.zeros(2)
-        self.goal[0] = int(np.digitize(self.desired_pose.position.x,self.horizontal_bins[0]))
-        self.goal[1] = int(np.digitize(self.desired_pose.position.y,self.horizontal_bins[1]))
-        print("Goal: %s"%(self.goal))
+        self.max_incl = 0.7
+        self.max_altitude = 2.0
 
         self.gazebo = GazeboConnection()
 
         self.grid_size = grid_size
         self.agent_pos = grid_size - 1
 
-        n_actions = 4
-        self.action_space = spaces.Discrete(n_actions)
-        self.observation_space = spaces.Box(low=0, high=self.grid_size, shape=(1,), dtype=np.float64)
+        self.action_space = spaces.Discrete(5)
+        self.observation_space = spaces.Box(low=0, high=5, shape=(1,), dtype=np.float32)
         self.reward_range = (-np.inf, np.inf)
 
         self._seed()
@@ -80,42 +61,43 @@ class YawEnv(gym.Env):
                 rospy.loginfo("Current drone pose not ready yet, retrying for getting robot pose")
         return data_pose
 
-    def init_desired_pose(self):
-        current_init_pose = self.take_observation()
-        self.best_dist = current_init_pose.position.x - self.desired_pose.position.x
-
     def reset(self):
         self.gazebo.resetSim()
-        self.gazebo.unpauseSim()
+        self.observation = np.array([0]).astype(np.float32)
 
-        self.init_desired_pose()
-        self.agent_pos = 0
-
-        self.gazebo.pauseSim()
-
-        return np.array([self.agent_pos]).astype(np.float32)
+        return self.observation
 
     def step(self, action):
-        if action == self.LEFT:
-            self.agent_pos -= 1
-        elif action == self.RIGHT:
-            self.agent_pos += 1
-        elif action == self.FORWARD:
-            self.agent_pos -= 0
-        elif action == self.BACKWARD:
-            self.agent_pos += 0
+
+        vel_cmd = Twist()
+        if action == 0: #FORWARD
+            vel_cmd.linear.x = self.speed_value
+            vel_cmd.angular.z = 0.0
+        elif action == 1: #LEFT
+            vel_cmd.linear.x = 1
+            vel_cmd.angular.z = self.speed_value
+        elif action == 2: #RIGHT
+            vel_cmd.linear.x = 1
+            vel_cmd.angular.z = -self.speed_value
+        elif action == 3: #Up
+            vel_cmd.linear.z = self.speed_value
+            vel_cmd.angular.z = 0.0
+        elif action == 4: #Down
+            vel_cmd.linear.z = -self.speed_value
+            vel_cmd.angular.z = 0.0
         else:
             raise ValueError("Received invalid action={} which is not part of the action space".format(action))
 
-        self.agent_pos = np.clip(self.agent_pos, 0, self.grid_size)
+        self.vel_pub.publish(vel_cmd)
+        time.sleep(self.running_step)
+        data_pose = self.take_observation()
+        self.observation = np.array([data_pose.position.x]).astype(np.float32)
 
-        done = bool(self.agent_pos == 0)
-
-        reward = 1 if self.agent_pos == 0 else 0
-
+        reward = 1- ((5 - data_pose.position.x)/5)
+        done = bool(reward >= 0.9)
         info = {}
 
-        return np.array([self.agent_pos]).astype(np.float32), reward, done, info
+        return self.observation, reward, done, info
 
     def render(self):
         pass

@@ -1,2 +1,0 @@
-model_checkpoint_path: "/home/tahsincan/rl_ws/src/drone_training/checkpoints/doubledqn_fin/ddqn-final-model.ckpt"
-all_model_checkpoint_paths: "/home/tahsincan/rl_ws/src/drone_training/checkpoints/doubledqn_fin/ddqn-final-model.ckpt"
