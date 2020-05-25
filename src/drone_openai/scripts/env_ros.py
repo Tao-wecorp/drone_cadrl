@@ -1,45 +1,45 @@
 #!/usr/bin/env python
 
-import gym
+import numpy as np
 import rospy
 import time
-import numpy as np
 
+import gym
 from gym import utils, spaces
+from gym.utils import seeding
+from gym.envs.registration import register
+
 from geometry_msgs.msg import Twist, Vector3Stamped, Pose, Point
 from sensor_msgs.msg import Imu
 from std_msgs.msg import Empty as EmptyTopicMsg, Bool
-from gym.utils import seeding
-from gym.envs.registration import register
-from helpers.utils.gazebo_connection import GazeboConnection
 
+from helpers.utils.gazebo_connection import GazeboConnection
+from helpers.control import Control
+control = Control()
 
 reg = register(
     id='Yaw-v0',
-    entry_point='env_yaw:YawEnv',
+    entry_point='env_ros:YawEnv',
     max_episode_steps=100,
     )
 
 
 class YawEnv(gym.Env):
-  
     LEFT = 0
     RIGHT = 1
     FORWARD = 2
     BACKWARD = 3
+    ACTIONS = [LEFT,RIGHT,FORWARD,BACKWARD]
 
     def __init__(self, grid_size=10):
         super(YawEnv, self).__init__()
 
-        self.pos_pub = rospy.Publisher('/drone/cmd_pos',Point,queue_size=1)
         self.vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=5)
-        self.takeoff_pub = rospy.Publisher('/drone/takeoff', EmptyTopicMsg, queue_size=0)
-        self.switch_pub = rospy.Publisher('/drone/posctrl',Bool,queue_size=1)
 
         self.desired_pose = Pose()
         self.desired_pose.position.z = 0
         self.desired_pose.position.x = 5
-        self.desired_pose.position.y = 5
+        self.desired_pose.position.y = 0
         
         self.running_step = 2
         self.max_incl = 0.3
@@ -49,8 +49,7 @@ class YawEnv(gym.Env):
         self.maxy = 5
         self.shape = (10,10)
 
-        self.incx = (self.maxx - self.minx)/ (self.shape[0])
-        self.incy = (self.maxy - self.miny)/ (self.shape[1])
+
         self.horizontal_bins = np.zeros((2,self.shape[1]))
         
         self.horizontal_bins[0] = np.linspace(self.minx,self.maxx,self.shape[1])
@@ -59,9 +58,8 @@ class YawEnv(gym.Env):
         self.goal[0] = int(np.digitize(self.desired_pose.position.x,self.horizontal_bins[0]))
         self.goal[1] = int(np.digitize(self.desired_pose.position.y,self.horizontal_bins[1]))
         print("Goal: %s"%(self.goal))
+
         self.gazebo = GazeboConnection()
-        
-        
 
         self.grid_size = grid_size
         self.agent_pos = grid_size - 1
@@ -73,8 +71,28 @@ class YawEnv(gym.Env):
 
         self._seed()
 
+    def take_observation (self):
+        data_pose = None
+        while data_pose is None:
+            try:
+                data_pose = rospy.wait_for_message('/drone/gt_pose', Pose, timeout=5)
+            except:
+                rospy.loginfo("Current drone pose not ready yet, retrying for getting robot pose")
+        return data_pose
+
+    def init_desired_pose(self):
+        current_init_pose = self.take_observation()
+        self.best_dist = current_init_pose.position.x - self.desired_pose.position.x
+
     def reset(self):
-        self.agent_pos = self.grid_size - 1
+        self.gazebo.resetSim()
+        self.gazebo.unpauseSim()
+
+        self.init_desired_pose()
+        self.agent_pos = 0
+
+        self.gazebo.pauseSim()
+
         return np.array([self.agent_pos]).astype(np.float32)
 
     def step(self, action):
@@ -100,9 +118,7 @@ class YawEnv(gym.Env):
         return np.array([self.agent_pos]).astype(np.float32), reward, done, info
 
     def render(self):
-        print("." * self.agent_pos, end="")
-        print("x", end="")
-        print("." * (self.grid_size - self.agent_pos))
+        pass
 
     def close(self):
         pass
