@@ -25,6 +25,8 @@ class YawEnv(gym.Env):
   
     LEFT = 0
     RIGHT = 1
+    FORWARD = 2
+    BACKWARD = 3
 
     def __init__(self, grid_size=10):
         super(YawEnv, self).__init__()
@@ -59,15 +61,17 @@ class YawEnv(gym.Env):
         print("Goal: %s"%(self.goal))
         self.gazebo = GazeboConnection()
         
-        self.action_space = spaces.Discrete(4) #Forward,Backward,Left,Right
-        self.reward_range = (-np.inf, np.inf)
+        
 
         self.grid_size = grid_size
         self.agent_pos = grid_size - 1
 
-        n_actions = 2
+        n_actions = 4
         self.action_space = spaces.Discrete(n_actions)
         self.observation_space = spaces.Box(low=0, high=self.grid_size, shape=(1,), dtype=np.float64)
+        self.reward_range = (-np.inf, np.inf)
+
+        self._seed()
 
     def reset(self):
         self.agent_pos = self.grid_size - 1
@@ -78,6 +82,10 @@ class YawEnv(gym.Env):
             self.agent_pos -= 1
         elif action == self.RIGHT:
             self.agent_pos += 1
+        elif action == self.FORWARD:
+            self.agent_pos -= 0
+        elif action == self.BACKWARD:
+            self.agent_pos += 0
         else:
             raise ValueError("Received invalid action={} which is not part of the action space".format(action))
 
@@ -98,3 +106,7 @@ class YawEnv(gym.Env):
 
     def close(self):
         pass
+
+    def _seed(self, seed=None):
+        self.np_random, seed = seeding.np_random(seed)
+        return [seed]
