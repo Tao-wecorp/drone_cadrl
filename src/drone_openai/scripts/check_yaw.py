@@ -13,6 +13,7 @@ tf.get_logger().setLevel(logging.ERROR)
 
 from stable_baselines3.common.env_checker import check_env
 import env_yaw
+import gym
 from gym.spaces import *
 
 env = gym.make("Yaw-v0")
