@@ -9,8 +9,7 @@ from gym import utils, spaces
 from gym.utils import seeding
 from gym.envs.registration import register
 
-from geometry_msgs.msg import Twist, Vector3Stamped, Pose, Point
-from sensor_msgs.msg import Imu
+from geometry_msgs.msg import Twist, Pose, Point
 from std_msgs.msg import Empty as EmptyTopicMsg, Bool
 
 from helpers.utils.gazebo_connection import GazeboConnection
@@ -31,35 +30,28 @@ class YawEnv(gym.Env):
 
         self.vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=5)
 
-        self.speed_value = 1.0
+        self.speed = 2.0
+        self.running_time = 0.5
+
         self.desired_pose = Pose()
-        self.desired_pose.position.z = 0
         self.desired_pose.position.x = 5
-        self.desired_pose.position.y = 0
-        
-        self.running_step = 2
-        self.max_incl = 0.7
-        self.max_altitude = 2.0
 
         self.gazebo = GazeboConnection()
 
-        self.grid_size = grid_size
-        self.agent_pos = grid_size - 1
-
-        self.action_space = spaces.Discrete(5)
+        self.action_space = spaces.Discrete(2)
         self.observation_space = spaces.Box(low=0, high=5, shape=(1,), dtype=np.float32)
         self.reward_range = (-np.inf, np.inf)
 
         self._seed()
 
-    def take_observation (self):
-        data_pose = None
-        while data_pose is None:
+    def observe(self):
+        pose = None
+        while pose is None:
             try:
-                data_pose = rospy.wait_for_message('/drone/gt_pose', Pose, timeout=5)
+                pose = rospy.wait_for_message('/drone/gt_pose', Pose, timeout=5)
             except:
                 rospy.loginfo("Current drone pose not ready yet, retrying for getting robot pose")
-        return data_pose
+        return pose
 
     def reset(self):
         self.gazebo.resetSim()
@@ -71,33 +63,23 @@ class YawEnv(gym.Env):
 
         vel_cmd = Twist()
         if action == 0: #FORWARD
-            vel_cmd.linear.x = self.speed_value
-            vel_cmd.angular.z = 0.0
-        elif action == 1: #LEFT
-            vel_cmd.linear.x = 1
-            vel_cmd.angular.z = self.speed_value
-        elif action == 2: #RIGHT
-            vel_cmd.linear.x = 1
-            vel_cmd.angular.z = -self.speed_value
-        elif action == 3: #Up
-            vel_cmd.linear.z = self.speed_value
-            vel_cmd.angular.z = 0.0
-        elif action == 4: #Down
-            vel_cmd.linear.z = -self.speed_value
-            vel_cmd.angular.z = 0.0
+            vel_cmd.linear.x = self.speed
+        elif action == 1: #BACKWARD
+            vel_cmd.linear.x = -self.speed
         else:
             raise ValueError("Received invalid action={} which is not part of the action space".format(action))
 
         self.vel_pub.publish(vel_cmd)
-        time.sleep(self.running_step)
-        data_pose = self.take_observation()
-        self.observation = np.array([data_pose.position.x]).astype(np.float32)
+        time.sleep(self.running_time)
+        pose = self.observe()
+        observation = np.array([pose.position.x]).astype(np.float32)
+        print(observation)
 
-        reward = 1- ((5 - data_pose.position.x)/5)
+        reward = 1- ((5 - pose.position.x)/5)
         done = bool(reward >= 0.9)
         info = {}
 
-        return self.observation, reward, done, info
+        return observation, reward, done, info
 
     def render(self):
         pass
