@@ -17,6 +17,7 @@ import gym
 from gym.spaces import *
 
 import rospy
+import time
 
 from helpers.utils.gazebo_connection import GazeboConnection
 from helpers.control import Control
@@ -25,11 +26,6 @@ control = Control()
 class CheckEnv(gym.Env):
     def __init__(self):
         rospy.init_node('check_node', anonymous=True)
-        self.gazebo = GazeboConnection()
-        self.gazebo.resetSim()
-
-        control.takeoff()
-        rospy.on_shutdown(self.shutdown)
 
         env = gym.make("Yaw-v0")
         check_env(env, warn=True)
@@ -43,8 +39,6 @@ class CheckEnv(gym.Env):
         print("Sampled action:", action)
         print(obs.shape, reward, done, info)
 
-    def shutdown(self):
-        control.land()
 
 def main():
     try:

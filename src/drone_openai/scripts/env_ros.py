@@ -26,11 +26,11 @@ reg = register(
 class YawEnv(gym.Env):
 
     def __init__(self, grid_size=10):
-        super(YawEnv, self).__init__()
 
-        self.vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=5)
+        self.pub_cmd_vel = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
+        self.move_msg = Twist()
 
-        self.speed = 2.0
+        self.speed = 1.0
         self.running_time = 0.5
 
         self.desired_pose = Pose()
@@ -55,25 +55,28 @@ class YawEnv(gym.Env):
 
     def reset(self):
         self.gazebo.resetSim()
+        self.move_msg.linear.z = 0.0
+        self.move_msg.angular.z = 0.0
+        self.pub_cmd_vel.publish(self.move_msg)
+
+        control.takeoff
         self.observation = np.array([0]).astype(np.float32)
 
         return self.observation
 
     def step(self, action):
 
-        vel_cmd = Twist()
         if action == 0: #FORWARD
-            vel_cmd.linear.x = self.speed
+            self.move_msg.linear.x = self.speed
         elif action == 1: #BACKWARD
-            vel_cmd.linear.x = -self.speed
+            self.move_msg.linear.x = -self.speed
         else:
             raise ValueError("Received invalid action={} which is not part of the action space".format(action))
-
-        self.vel_pub.publish(vel_cmd)
+        
+        self.pub_cmd_vel.publish(self.move_msg)
         time.sleep(self.running_time)
         pose = self.observe()
         observation = np.array([pose.position.x]).astype(np.float32)
-        print(observation)
 
         reward = 1- ((5 - pose.position.x)/5)
         done = bool(reward >= 0.9)
