@@ -10,11 +10,11 @@ from tf.transformations import euler_from_quaternion
 import drone_env
 
 reg = register(
-        id='DroneGoto-v0',
-        entry_point='drone_goto:DroneGotoEnv',
-        max_episode_steps=100,
+        id='DroneFlyto-v0',
+        entry_point='flyto_env:DroneFlytoEnv',
+        max_episode_steps=1000,
     )
 
-class DroneGotoEnv(drone_env.DroneEnv):
+class DroneFlytoEnv(drone_env.DroneEnv):
     def __init__(self):
         return True
