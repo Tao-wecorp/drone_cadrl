@@ -11,25 +11,30 @@ tf.autograph.set_verbosity(0)
 import logging
 tf.get_logger().setLevel(logging.ERROR)
 
-import env_yaw
+import env_ros
+import gym
+import rospy
+
 from stable_baselines import DQN, PPO2, A2C, ACKTR
 from stable_baselines.common.cmd_util import make_vec_env
 from stable_baselines.common.evaluation import evaluate_policy
 from stable_baselines.common.vec_env import VecVideoRecorder, DummyVecEnv
 from stable_baselines.common.callbacks import EvalCallback, StopTrainingOnRewardThreshold
 
-env = gym.make("Yaw-v0")
-env = make_vec_env(lambda: env, n_envs=1)
 
-callback_on_best = StopTrainingOnRewardThreshold(reward_threshold=0.9, verbose=1)
-eval_callback = EvalCallback(env, callback_on_new_best=callback_on_best, verbose=1)
+class TrainEnv(gym.Env):
+    def __init__(self):
+        rospy.init_node('train_node', anonymous=True)
 
-model = ACKTR('MlpPolicy', env, verbose=1)
-model.learn(int(1e10), callback=eval_callback)
+        env = gym.make("Yaw-v0")
+        env = make_vec_env(lambda: env, n_envs=1)
+        model = DQN('MlpPolicy', env, verbose=1).learn(1000)
 
-mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=100)
-print(f"mean_reward:{mean_reward:.2f} +/- {std_reward:.2f}")
-
-model.save('models/acktr_yaw')
-
-env.close()
+def main():
+    try:
+        TrainEnv()
+    except KeyboardInterrupt:
+        pass
+    
+if __name__ == '__main__':
+    main()
