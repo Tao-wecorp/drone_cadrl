@@ -1,4 +1,4 @@
 #!/bin/bash
 
 source devel/setup.bash
-rosrun drone_openai train_ros.py
+rosrun drone_openai yaw.py
