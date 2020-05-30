@@ -1,23 +1,14 @@
 #! /usr/bin/env python
 
-import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
-import warnings
-warnings.simplefilter(action='ignore', category=FutureWarning)
-warnings.simplefilter(action='ignore', category=Warning)
-import tensorflow as tf
-tf.get_logger().setLevel('INFO')
-tf.autograph.set_verbosity(0)
-import logging
-tf.get_logger().setLevel(logging.ERROR)
-
-from stable_baselines3.common.env_checker import check_env
-import parrotdrone_goto
 import gym
 from gym.spaces import *
-
 import rospy
 import time
+import utils.warning_ignore
+
+import parrotdrone_goto
+from stable_baselines3.common.env_checker import check_env
+
 
 class CheckEnv(parrotdrone_goto.ParrotDroneGotoEnv):
     def __init__(self):
