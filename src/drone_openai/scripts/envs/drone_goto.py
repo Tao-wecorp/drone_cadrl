@@ -68,7 +68,7 @@ class DroneGotoEnv(parrotdrone_env.ParrotDroneEnv):
                         angular_speed,
                         epsilon=0.05,
                         update_rate=10)
-        time.sleep(3)
+        time.sleep(0.1)
 
     def _get_obs(self):
         gt_pose = self.get_gt_pose()
@@ -80,7 +80,9 @@ class DroneGotoEnv(parrotdrone_env.ParrotDroneEnv):
     
     def _is_done(self, observations):
         episode_done = False
-        episode_done = bool(self.reward >= 0.9)
+        episode_done = bool(self.reward >= 0.98)
+        if episode_done:
+            print("Done!")
         return episode_done
     
     def _compute_reward(self, observations, done):

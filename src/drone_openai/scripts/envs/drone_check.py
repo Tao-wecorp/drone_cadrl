@@ -12,18 +12,18 @@ import logging
 tf.get_logger().setLevel(logging.ERROR)
 
 from stable_baselines3.common.env_checker import check_env
-import drone_goto
+import parrotdrone_goto
 import gym
 from gym.spaces import *
 
 import rospy
 import time
 
-class CheckEnv(drone_goto.DroneGotoEnv):
+class CheckEnv(parrotdrone_goto.ParrotDroneGotoEnv):
     def __init__(self):
         rospy.init_node('check_node', anonymous=True)
 
-        env = gym.make("DroneGoto-v0")
+        env = gym.make("ParrotDroneGoto-v0")
         # check_env(env, warn=True)
         obs = env.reset()
         action = env.action_space.sample()
