@@ -24,7 +24,7 @@ class CheckEnv(drone_goto.DroneGotoEnv):
         rospy.init_node('check_node', anonymous=True)
 
         env = gym.make("DroneGoto-v0")
-        check_env(env, warn=True)
+        # check_env(env, warn=True)
         obs = env.reset()
         action = env.action_space.sample()
         obs, reward, done, info = env.step(action)
