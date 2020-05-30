@@ -1,4 +1,4 @@
 #!/bin/bash
 
 source devel/setup.bash
-rosrun drone_openai drone_train.py
+rosrun drone_openai sjtu_check.py
