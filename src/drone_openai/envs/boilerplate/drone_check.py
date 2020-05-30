@@ -6,15 +6,15 @@ import rospy
 import time
 import utils.warning_ignore
 
-import parrotdrone_goto
+import drone_goto
 from stable_baselines3.common.env_checker import check_env
 
 
-class CheckEnv(parrotdrone_goto.ParrotDroneGotoEnv):
+class CheckEnv(drone_goto.DroneGotoEnv):
     def __init__(self):
         rospy.init_node('check_node', anonymous=True)
 
-        env = gym.make("ParrotDroneGoto-v0")
+        env = gym.make("DroneGoto-v0")
         # check_env(env, warn=True)
         obs = env.reset()
         action = env.action_space.sample()

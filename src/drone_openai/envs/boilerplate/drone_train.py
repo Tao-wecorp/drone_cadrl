@@ -5,7 +5,7 @@ import numpy as np
 import rospy
 import utils.warning_ignore
 
-import parrotdrone_goto
+import drone_goto
 from stable_baselines.deepq import DQN, MlpPolicy
 
 
@@ -28,7 +28,7 @@ def callback(lcl, _glb):
 
 def main():
     rospy.init_node('train_node', anonymous=True)
-    env = gym.make("ParrotDroneGoto-v0")
+    env = gym.make("DroneGoto-v0")
     model = DQN(
         env=env,
         policy=MlpPolicy,
@@ -39,8 +39,7 @@ def main():
     )
     model.learn(total_timesteps=1000, callback=callback)
 
-    # print("Saving model to cartpole_model.zip")
-    # model.save("cartpole_model.zip")
+    # model.save("model.zip")
 
 
 if __name__ == '__main__':

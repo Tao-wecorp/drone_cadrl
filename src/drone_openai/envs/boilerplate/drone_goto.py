@@ -8,12 +8,12 @@ from geometry_msgs.msg import Vector3
 from tf.transformations import euler_from_quaternion
 
 
-register(
-        id='ParrotDroneGoto-v0',
-        entry_point='parrotdrone_goto:ParrotDroneGotoEnv',
+reg = register(
+        id='DroneGoto-v0',
+        entry_point='drone_goto:DroneGotoEnv',
     )
 
-class ParrotDroneGotoEnv(parrotdrone_env.ParrotDroneEnv):
+class DroneGotoEnv(parrotdrone_env.ParrotDroneEnv):
     def __init__(self):
         """
         Make parrotdrone learn how to navigate to get to a point
@@ -90,7 +90,7 @@ class ParrotDroneGotoEnv(parrotdrone_env.ParrotDroneEnv):
         self.cumulated_steps = 0.0
 
         # Here we will add any init functions prior to starting the MyRobotEnv
-        super(ParrotDroneGotoEnv, self).__init__()
+        super(DroneGotoEnv, self).__init__()
 
     def _set_init_pose(self):
         """
