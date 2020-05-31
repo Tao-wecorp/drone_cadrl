@@ -1,7 +1,7 @@
 import rospy
 import numpy
 from gym import spaces
-from openai_ros.robot_envs import parrotdrone_env
+import sjtu_env
 from gym.envs.registration import register
 from geometry_msgs.msg import Point
 from geometry_msgs.msg import Vector3
@@ -9,11 +9,11 @@ from tf.transformations import euler_from_quaternion
 
 
 reg = register(
-        id='DroneGotoEnv-v0',
-        entry_point='sjtu_goto:DroneGotoEnv',
+        id='SJTUGotoEnv-v0',
+        entry_point='sjtu_goto:SJTUGotoEnv',
     )
 
-class DroneGotoEnv(parrotdrone_env.ParrotDroneEnv):
+class SJTUGotoEnv(sjtu_env.SJTUDroneEnv):
     def __init__(self):
 
         # Initial and Desired Point
@@ -56,7 +56,7 @@ class DroneGotoEnv(parrotdrone_env.ParrotDroneEnv):
         self.end_episode_points = 10
         self.cumulated_steps = 0.0
 
-        super(DroneGotoEnv, self).__init__()
+        super(SJTUGotoEnv, self).__init__()
 
     def _set_init_pose(self):
         self.move_base(self.init_linear_speed_vector,
@@ -108,7 +108,6 @@ class DroneGotoEnv(parrotdrone_env.ParrotDroneEnv):
         is_inside_workspace_now = self.is_inside_workspace(current_position)
         has_reached_des_point = self.is_in_desired_position(current_position, self.desired_point_epsilon)
         
-        rospy.logwarn("RESULTS")
         if not is_inside_workspace_now:
             rospy.logerr("Out of workspace")
         
@@ -172,7 +171,7 @@ class DroneGotoEnv(parrotdrone_env.ParrotDroneEnv):
         is_in_desired_pos = x_pos_are_close and y_pos_are_close
         
         rospy.logwarn("POSITION")
-        rospy.logwarn("current position: " + str(current_position))
+        rospy.logwarn("Current position: " + str(current_position))
         
         return is_in_desired_pos
     
