@@ -10,11 +10,11 @@ import sjtu_goto
 from stable_baselines3.common.env_checker import check_env
 
 
-class CheckEnv(sjtu_goto.SJTUGotoEnv):
+class CheckEnv(sjtu_goto.DroneGotoEnv):
     def __init__(self):
         rospy.init_node('check_node', anonymous=True)
 
-        env = gym.make("SJTUGotoEnv-v0")
+        env = gym.make("DroneGoto-v0")
         # check_env(env, warn=True)
         obs = env.reset()
         action = env.action_space.sample()
