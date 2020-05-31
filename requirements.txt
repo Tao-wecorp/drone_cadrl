@@ -206,7 +206,6 @@ stevedore==1.32.0
 tables==3.5.2
 tellopy==0.6.0
 tensorboard==1.15.0
-tensorflow==1.15.0rc2
 tensorflow-estimator==1.15.1
 tensorflow-gpu==1.15.2
 termcolor==1.1.0
