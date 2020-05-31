@@ -9,7 +9,7 @@ from tf.transformations import euler_from_quaternion
 
 
 reg = register(
-        id='DroneGoto-v0',
+        id='DroneGotoEnv-v0',
         entry_point='sjtu_goto:DroneGotoEnv',
     )
 
@@ -17,7 +17,7 @@ class DroneGotoEnv(parrotdrone_env.ParrotDroneEnv):
     def __init__(self):
 
         # Initial and Desired Point
-        self.linear_forward_speed = 10
+        self.linear_forward_speed = 2
         self.init_angular_turn_speed = 0
         self.init_linear_speed_vector = Vector3()
         self.init_linear_speed_vector.x = 0
@@ -28,7 +28,7 @@ class DroneGotoEnv(parrotdrone_env.ParrotDroneEnv):
         self.desired_point.x = 5
         self.desired_point.y = 0
         self.desired_point.z = 0
-        self.desired_point_epsilon = 0.2
+        self.desired_point_epsilon = 0.5
 
         # Actions and Observations
         number_actions = 2

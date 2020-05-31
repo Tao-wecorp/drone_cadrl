@@ -14,7 +14,7 @@ class CheckEnv(sjtu_goto.DroneGotoEnv):
     def __init__(self):
         rospy.init_node('check_node', anonymous=True)
 
-        env = gym.make("DroneGoto-v0")
+        env = gym.make("DroneGotoEnv-v0")
         # check_env(env, warn=True)
         obs = env.reset()
         action = env.action_space.sample()
