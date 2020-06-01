@@ -74,7 +74,7 @@ class Yaw(object):
                 cv2.waitKey(1)
                  
                 # print("%s seconds" % (time.time() - start_time))
-
+                
             self.rate.sleep()
     
     def cam_callback(self,data):
