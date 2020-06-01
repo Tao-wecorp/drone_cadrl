@@ -2,11 +2,13 @@
 
 import rospy
 import time
+from math import *
 from std_msgs.msg import Empty
 from geometry_msgs.msg import Twist
 
 class Control:
     def __init__(self):
+        self.goal = 0.0  # [angle]
         self.ctrl_c = False
         self._pub_cmd_vel = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
         self._move_msg = Twist()
@@ -48,3 +50,9 @@ class Control:
         self._move_msg.linear.x = 1.0
         self._move_msg.angular.z = 0.0
         self_pub_cmd_vel.publish(self._move_msg)
+
+    def yaw(self, position):
+        new_goal = degrees(atan(float(320-position[0])/(480-position[1])))
+        yaw = new_goal + self.goal
+        self.goal = yaw
+        return yaw
