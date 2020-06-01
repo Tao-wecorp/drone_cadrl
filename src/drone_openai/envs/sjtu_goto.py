@@ -170,8 +170,7 @@ class SJTUGotoEnv(sjtu_env.SJTUDroneEnv):
         
         is_in_desired_pos = x_pos_are_close and y_pos_are_close
         
-        rospy.logwarn("POSITION")
-        rospy.logwarn("Current position: " + str(current_position))
+        rospy.loginfo("Position: " + str(current_position.x) + ", " + str(current_position.y) + ", " + str(current_position.z))
         
         return is_in_desired_pos
     

@@ -11,7 +11,7 @@ from stable_baselines.deepq import DQN, MlpPolicy
 
 def main():
     rospy.init_node('train_node', anonymous=True)
-    env = gym.make("DroneGotoEnv-v0")
+    env = gym.make("SJTUGotoEnv-v0")
     model = DQN(
         env=env,
         policy=MlpPolicy,

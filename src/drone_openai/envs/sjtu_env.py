@@ -217,7 +217,6 @@ class SJTUDroneEnv(robot_gazebo_env.RobotGazeboEnv):
                 takeoff_height_achieved = current_height >= heigh_value_to_check
             
             if takeoff_height_achieved:
-                rospy.logwarn("Reached Height!")
                 end_wait_time = rospy.get_rostime().to_sec()
                 break
             rate.sleep()
