@@ -30,13 +30,13 @@ pose = Pose()
 class Yaw(object):
     def __init__(self):
         rospy.init_node('yaw_node', anonymous=True)
+    
         self.rate = rospy.Rate(10)
+        self.frame = None
+        self.bridge_object = CvBridge()
         self.robot_position = None
 
         rospy.Subscriber("/drone/front_camera/image_raw",Image,self.cam_callback)
-        self.bridge_object = CvBridge()
-        self.frame = None
-
         self.states_sub = rospy.Subscriber("/gazebo/model_states",ModelStates,self.states_callback)
         self.set_state = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
 
@@ -73,7 +73,8 @@ class Yaw(object):
                 cv2.imshow("", frame)
                 cv2.waitKey(1)
                  
-                # print("%s seconds" % (time.time() - start_time))
+                print("%s seconds" % (time.time() - start_time))
+                time.sleep((time.time() - start_time))
                 
             self.rate.sleep()
     

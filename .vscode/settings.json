@@ -1,5 +1,4 @@
 {
-    "python.pythonPath": "/home/robotics/.virtualenvs/py3venv/bin/python",
     "python.linting.enabled": false,
     "python.autoComplete.extraPaths": [
         "/home/robotics/Workspace/drone_openai/devel/lib/python3/dist-packages",
