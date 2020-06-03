@@ -1,4 +1,4 @@
-# Jetbot CADRL
+# SITU Drone OpenAI Baselines
 Running SJTU Drone with Gazebo simulation, OpenAI Gym and Stable Baselines 
 
 ## Env
