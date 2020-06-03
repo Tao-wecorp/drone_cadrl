@@ -19,30 +19,38 @@ from math import *
 import numpy as np
 import time
 
+# Helpers
 from helpers.cvlib import Detection
 detection = Detection()
 
 from helpers.control import Control
 control = Control()
-fpv = [320, 480]
 pose = Pose()
+fpv = [320, 480]
+
+from helpers.utils.gazebo_connection import GazeboConnection
+gazebo = GazeboConnection()
 
 class Yaw(object):
     def __init__(self):
+        # Init
         rospy.init_node('yaw_node', anonymous=True)
-    
         self.rate = rospy.Rate(10)
         self.frame = None
         self.bridge_object = CvBridge()
+        
         self.robot_position = None
 
+        # Sub & Pub
         rospy.Subscriber("/drone/front_camera/image_raw",Image,self.cam_callback)
         self.states_sub = rospy.Subscriber("/gazebo/model_states",ModelStates,self.states_callback)
         self.set_state = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
 
+        # Takeoff & Land
         control.takeoff()
         rospy.on_shutdown(self.shutdown)
 
+        # Yaw
         state_robot_msg = ModelState()
         state_robot_msg.model_name = 'sjtu_drone'
         while not rospy.is_shutdown():
@@ -78,6 +86,7 @@ class Yaw(object):
                 
             self.rate.sleep()
     
+    # Methods
     def cam_callback(self,data):
         try:
             cv_img = self.bridge_object.imgmsg_to_cv2(data, desired_encoding="bgr8")

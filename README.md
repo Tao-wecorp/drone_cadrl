@@ -1,17 +1,9 @@
 # Jetbot CADRL
-Running CADRL_ROS on Jetbot with Gazebo simulation
-
-## To-do
-1. Import Jetbot model into Gazebo;
-2. Train DQN single agent model;
-3. Train CADRL multi-agent model;
-4. Deploy models onto Jebot. 
+Running SJTU Drone with Gazebo simulation, OpenAI Gym and Stable Baselines 
 
 ## Env
-    sudo apt-get install python-pip ros-melodic-ros-control ros-melodic-ros-controllers ros-melodic-joint-state-publisher-gui
-    pip2 install imageio==2.6.1
-    pip2 install tensorflow-gpu==1.14.0 keras==2.3.1
-    pip2 install cvlib --no-deps
-    pip2 install requests progressbar imutils  opencv-python
+Install Env from requirements.txt
 
-1. Replace all "home/kimbring2/catkin_ws/src/jetbot/jetbot_gazebo" with "home/robotics/Workspace/jetbot_cadrl/src/jetbot_gazebo/jetbot/jetbot_gazebo"
+## Run
+    ./run_gazebo.sh
+    ./run_script.sh
