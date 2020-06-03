@@ -1,4 +1,4 @@
-# SITU Drone OpenAI Baselines
+# SITU Drone OpenAI
 Running SJTU Drone with Gazebo simulation, OpenAI Gym and Stable Baselines 
 
 ## Env
