@@ -3,8 +3,9 @@
 import gym
 from gym.spaces import *
 import rospy
-import time
+
 import utils.warning_ignore
+from utils.saved_dir import model_dir, log_dir
 
 import sjtu_goto
 from stable_baselines3.common.env_checker import check_env

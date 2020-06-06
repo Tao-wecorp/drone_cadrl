@@ -2,13 +2,10 @@
 
 import gym
 import numpy as np
-
-import os
 import rospy
-import rospkg
+
 import utils.warning_ignore
-rospack = rospkg.RosPack()
-model_folder = os.path.join(rospack.get_path("drone_openai"), "envs/models/")
+from utils.saved_dir import model_dir, log_dir
 
 import sjtu_goto
 from stable_baselines.deepq import DQN, MlpPolicy
@@ -21,7 +18,7 @@ def main():
     rospy.init_node('train_node', anonymous=True)
     env = gym.make("SJTUGotoEnv-v0")
     env = DummyVecEnv([lambda: env])
-    model = PPO2.load(model_folder + "double_q", env=env)
+    model = PPO2.load(model_dir + "double_q", env=env)
 
     obs = env.reset()
     n_steps = 20
