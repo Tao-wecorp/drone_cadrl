@@ -52,8 +52,7 @@ class SJTUGotoEnv(sjtu_env.SJTUDroneEnv):
         # Rewards
         self.reward_range = (-numpy.inf, numpy.inf)
         self.closer_to_point_reward = 0.1
-        self.not_ending_point_reward = -0.1
-        self.end_episode_points = 1
+        self.end_episode_points = 10
         self.cumulated_steps = 0.0
 
         super(SJTUGotoEnv, self).__init__()
@@ -62,7 +61,7 @@ class SJTUGotoEnv(sjtu_env.SJTUDroneEnv):
         self.move_base(self.init_linear_speed_vector,
                     self.init_angular_turn_speed,
                     epsilon=0.05,
-                    update_rate=30)
+                    update_rate=10)
         return True
 
     def _init_env_variables(self):
@@ -86,7 +85,7 @@ class SJTUGotoEnv(sjtu_env.SJTUDroneEnv):
         self.move_base(linear_speed_vector,
                         angular_speed,
                         epsilon=0.05,
-                        update_rate=30)
+                        update_rate=10)
     
     def _get_obs(self):
         gt_pose = self.get_gt_pose()                
@@ -137,7 +136,7 @@ class SJTUGotoEnv(sjtu_env.SJTUDroneEnv):
                 reward = self.closer_to_point_reward
             else:
                 rospy.logerr("Punished")
-                reward = 0
+                reward = -1*self.closer_to_point_reward
         else:
             if self.is_in_desired_position(current_position, epsilon=0.5):
                 reward = self.end_episode_points

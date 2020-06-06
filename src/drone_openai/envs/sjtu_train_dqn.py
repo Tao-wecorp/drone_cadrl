@@ -9,14 +9,16 @@ from utils.saved_dir import model_dir, log_dir
 
 import sjtu_goto
 from stable_baselines.deepq import DQN, MlpPolicy
+from stable_baselines.bench import Monitor
 from stable_baselines.common.evaluation import evaluate_policy
 from stable_baselines.common.callbacks import EvalCallback, StopTrainingOnRewardThreshold
 
 def main():
     rospy.init_node('train_node', anonymous=True)
     env = gym.make("SJTUGotoEnv-v0")
+    env = Monitor(env, log_dir)
 
-    callback_on_best = StopTrainingOnRewardThreshold(reward_threshold=0.9, verbose=1)
+    callback_on_best = StopTrainingOnRewardThreshold(reward_threshold=1, verbose=1)
     eval_callback = EvalCallback(env, callback_on_new_best=callback_on_best, verbose=1)
 
     kwargs = {'double_q': True, 'prioritized_replay': True, 'policy_kwargs': dict(dueling=True)}
