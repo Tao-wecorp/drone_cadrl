@@ -2,10 +2,13 @@
 
 import gym
 import numpy as np
+
 import os
 import rospy
 import rospkg
 import utils.warning_ignore
+rospack = rospkg.RosPack()
+model_folder = os.path.join(rospack.get_path("drone_openai"), "envs/models/")
 
 import sjtu_goto
 from stable_baselines.deepq import DQN, MlpPolicy
@@ -29,8 +32,6 @@ def main():
     mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=10)
     print(f"mean_reward:{mean_reward:.2f} +/- {std_reward:.2f}")
 
-    rospack = rospkg.RosPack()
-    model_folder = os.path.join(rospack.get_path("drone_openai"), "envs/models/")
     model.save(model_folder + "double_q")
 
 if __name__ == '__main__':

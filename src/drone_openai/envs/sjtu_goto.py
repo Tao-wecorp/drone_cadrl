@@ -34,10 +34,10 @@ class SJTUGotoEnv(sjtu_env.SJTUDroneEnv):
         number_actions = 2
         self.action_space = spaces.Discrete(number_actions)
 
-        self.work_space_x_max = 10
-        self.work_space_x_min = -10
-        self.work_space_y_max = 10
-        self.work_space_y_min = -10
+        self.work_space_x_max = 8
+        self.work_space_x_min = -1
+        self.work_space_y_max = 3
+        self.work_space_y_min = -3
         self.work_space_z_max = 2
         self.work_space_z_min = 0
         high = numpy.array([self.work_space_x_max,
@@ -52,8 +52,8 @@ class SJTUGotoEnv(sjtu_env.SJTUDroneEnv):
         # Rewards
         self.reward_range = (-numpy.inf, numpy.inf)
         self.closer_to_point_reward = 0.1
-        self.not_ending_point_reward = -0.01
-        self.end_episode_points = 10
+        self.not_ending_point_reward = -0.1
+        self.end_episode_points = 1
         self.cumulated_steps = 0.0
 
         super(SJTUGotoEnv, self).__init__()
