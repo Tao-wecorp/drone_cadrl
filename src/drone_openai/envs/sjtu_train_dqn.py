@@ -27,7 +27,7 @@ def main():
         policy=MlpPolicy, 
         **kwargs
     )
-    model.learn(int(1e10), callback=eval_callback)
+    model.learn(int(100), callback=eval_callback)
     mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=10)
     print(f"mean_reward:{mean_reward:.2f} +/- {std_reward:.2f}")
 

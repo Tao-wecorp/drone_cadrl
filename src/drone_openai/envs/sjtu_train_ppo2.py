@@ -2,6 +2,7 @@
 
 import gym
 import numpy as np
+import matplotlib.pyplot as plt
 import rospy
 
 import utils.warning_ignore
@@ -11,19 +12,27 @@ import sjtu_goto
 from stable_baselines import PPO2
 from stable_baselines.common.policies import MlpPolicy
 from stable_baselines.common.evaluation import evaluate_policy
+from stable_baselines import results_plotter
 from stable_baselines.bench import Monitor
-
+from stable_baselines.common.evaluation import evaluate_policy
+from stable_baselines.common.callbacks import EvalCallback, StopTrainingOnRewardThreshold
 
 def main():
     rospy.init_node('train_node', anonymous=True)
     env = gym.make("SJTUGotoEnv-v0")
-    # env = DummyVecEnv([lambda: env])
     env = Monitor(env, log_dir)
+
+    callback_on_best = StopTrainingOnRewardThreshold(reward_threshold=10, verbose=1)
+    eval_callback = EvalCallback(env, callback_on_new_best=callback_on_best, verbose=1)
+
     model = PPO2(MlpPolicy, env, verbose=1)
-    model.learn(total_timesteps=10)
-    mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=10)
-    print(f"mean_reward:{mean_reward:.2f} +/- {std_reward:.2f}")
-    model.save(model_dir + "double_q")
+    model.learn(total_timesteps=1000, callback=eval_callback)
+    # mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=10)
+    # print(f"mean_reward:{mean_reward:.2f} +/- {std_reward:.2f}")
+
+    model.save(model_dir + "ppo2")
+    results_plotter.plot_results([log_dir], time_steps, results_plotter.X_TIMESTEPS, "PPO2")
+    plt.show()
 
 if __name__ == '__main__':
     main()
