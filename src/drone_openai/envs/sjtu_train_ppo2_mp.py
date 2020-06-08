@@ -16,12 +16,17 @@ from stable_baselines.common.vec_env import DummyVecEnv, SubprocVecEnv
 from stable_baselines.common import set_global_seeds
 from stable_baselines.common.cmd_util import make_vec_env
 from stable_baselines.bench import Monitor
+from stable_baselines.common.callbacks import EvalCallback
 
 
 def main():
     rospy.init_node('train_node', anonymous=True)
     num_cpu = 8
-    env = make_vec_env("SJTUGotoEnv-v0", n_envs=num_cpu)
+    env = make_vec_env("SJTUGotoEnv-v0", n_envs=1)
+
+    eval_callback = EvalCallback(env, best_model_save_path=model_dir,
+                             log_path=log_dir, eval_freq=500,
+                             deterministic=True, render=False)
 
     # model = PPO2(MlpPolicy, env, verbose=1)
     model = PPO2.load(model_dir + "ppo2_mp", env=env)

@@ -2,7 +2,9 @@
 
 import gym
 import numpy as np
+
 import matplotlib.pyplot as plt
+
 import rospy
 
 import utils.warning_ignore
@@ -21,7 +23,7 @@ def main():
     rospy.init_node('train_node', anonymous=True)
     env = gym.make("SJTUGotoEnv-v0")
     env = DummyVecEnv([lambda: env])
-    model = PPO2.load(model_dir + "ppo2_mp", env=env)
+    model = PPO2.load(model_dir + "ppo2", env=env)
 
     obs = env.reset()
     n_steps = 20
@@ -34,9 +36,6 @@ def main():
         if done:
             print("Goal reached!", "reward=", reward)
             break
-    
-    # results_plotter.plot_results([log_dir], 100, results_plotter.X_TIMESTEPS, "PPO2")
-    # plt.show()
 
 if __name__ == '__main__':
     main()

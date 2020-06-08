@@ -25,8 +25,8 @@ def main():
     callback_on_best = StopTrainingOnRewardThreshold(reward_threshold=10, verbose=1)
     eval_callback = EvalCallback(env, callback_on_new_best=callback_on_best, verbose=1)
 
-    model = PPO2(MlpPolicy, env, verbose=1)
-    model.learn(total_timesteps=5000, callback=eval_callback)
+    model = PPO2(MlpPolicy, env, verbose=1, tensorboard_log=log_dir, )
+    model.learn(total_timesteps=5000, callback=eval_callback, reset_num_timesteps=False)
 
     model.save(model_dir + "ppo2")
 
