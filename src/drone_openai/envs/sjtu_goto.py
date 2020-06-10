@@ -1,7 +1,7 @@
 import rospy
 import numpy
 from gym import spaces
-import sjtu_env
+import yaw_env
 from gym.envs.registration import register
 from geometry_msgs.msg import Point
 from geometry_msgs.msg import Vector3
@@ -13,7 +13,7 @@ reg = register(
         entry_point='sjtu_goto:SJTUGotoEnv',
     )
 
-class SJTUGotoEnv(sjtu_env.SJTUDroneEnv):
+class SJTUGotoEnv(yaw_env.SJTUDroneEnv):
     def __init__(self):
 
         # Initial and Desired Point

@@ -68,7 +68,8 @@ class Yaw(object):
                     rospy.wait_for_service('/gazebo/set_model_state')
                     try:
                         pose.position = robot_position
-                        pose.orientation = Quaternion(*quaternion_from_euler(0.0, 0.0, yaw_angle*pi/180))                        
+                        pose.orientation = Quaternion(*quaternion_from_euler(0.0, 0.0, yaw_angle*pi/180))
+                        print(pose.orientation)                   
                         state_robot_msg.pose = pose
 
                         self.set_state(state_robot_msg)
