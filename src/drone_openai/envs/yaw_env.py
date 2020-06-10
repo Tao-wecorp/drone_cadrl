@@ -76,18 +76,9 @@ class SJTUDroneEnv(robot_gazebo_env.RobotGazeboEnv):
             except:
                 rospy.logerr("Current /drone/gt_vel not ready yet, retrying for getting gt_vel")
         return self.gt_vel
-
-    def _down_camera_rgb_image_raw_callback(self, data):
-        self.down_camera_rgb_image_raw = data
     
     def _front_camera_rgb_image_raw_callback(self, data):
         self.front_camera_rgb_image_raw = data
-        
-    def _imu_callback(self, data):
-        self.imu = data
-        
-    def _sonar_callback(self, data):
-        self.sonar = data
         
     def _gt_pose_callback(self, data):
         self.gt_pose = data
