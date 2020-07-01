@@ -19,3 +19,6 @@
 [submodule "src/stable-baselines3"]
 	path = src/stable-baselines3
 	url = https://github.com/DLR-RM/stable-baselines3
+[submodule "src/teleop_twist_joy"]
+	path = src/teleop_twist_joy
+	url = https://github.com/ros-teleop/teleop_twist_joy
