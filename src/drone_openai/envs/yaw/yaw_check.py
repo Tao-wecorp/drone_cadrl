@@ -16,7 +16,7 @@ class CheckEnv(yaw_task.SJTUYawEnv):
         rospy.init_node('check_node', anonymous=True)
 
         env = gym.make("SJTUYawEnv-v0")
-        check_env(env, warn=True)
+        # check_env(env, warn=True)
         obs = env.reset()
         action = env.action_space.sample()
         obs, reward, done, info = env.step(action)
