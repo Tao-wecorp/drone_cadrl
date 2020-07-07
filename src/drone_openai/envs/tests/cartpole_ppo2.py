@@ -5,6 +5,7 @@ import numpy as np
 
 from stable_baselines import PPO2
 from stable_baselines.common.policies import MlpPolicy
+from stable_baselines.common.vec_env import DummyVecEnv
 
 import utils.warning_ignore
 from utils.saved_dir import model_dir, log_dir
@@ -39,17 +40,23 @@ def evaluate(model, num_episodes=100):
     return mean_episode_reward
 
 
-env = gym.make('CartPole-v1')
-model = PPO2(MlpPolicy, env, verbose=0)
-mean_reward_before_train = evaluate(model, num_episodes=100)
+# env = gym.make('CartPole-v1')
+# model = PPO2(MlpPolicy, env, verbose=0)
+# mean_reward_before_train = evaluate(model, num_episodes=100)
 
-model = PPO2('MlpPolicy', "CartPole-v1", verbose=0).learn(1000)
-model.save(model_dir + "/ppo2")
-mean_reward_before_train = evaluate(model, num_episodes=100)
+# model = PPO2('MlpPolicy', "CartPole-v1", verbose=0).learn(1000)
+# model.save(model_dir + "/ppo2")
+# mean_reward_after_train = evaluate(model, num_episodes=100)
 
-obs = model.env.observation_space.sample()
-print("pre saved", model.predict(obs, deterministic=True))
-del model
+# obs = model.env.observation_space.sample()
+# print("pre saved", model.predict(obs, deterministic=True))
+# del model
 
 loaded_model = PPO2.load(model_dir + "ppo2")
-print("loaded", loaded_model.predict(obs, deterministic=True))
+loaded_model.set_env(DummyVecEnv([lambda: gym.make('CartPole-v1')]))
+mean_reward_after_train = evaluate(loaded_model, num_episodes=100)
+# print("loaded:", "gamma =", loaded_model.gamma, "n_steps =", loaded_model.n_steps)
+
+loaded_model.learn(8000)
+loaded_model.save(model_dir + "/ppo2")
+mean_reward_after_train = evaluate(loaded_model, num_episodes=100)
