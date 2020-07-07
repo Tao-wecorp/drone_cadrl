@@ -96,7 +96,7 @@ class Yaw(object):
         self.frame = cv_img
     
     def states_callback(self,data):
-        self.robot_position = data.pose[2].position   
+        self.robot_position = data.pose[-1].position   
     
     def shutdown(self):
         control.land()
