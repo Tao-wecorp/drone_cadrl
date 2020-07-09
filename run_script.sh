@@ -1,4 +1,4 @@
 #!/bin/bash
 
 source devel/setup.bash
-rosrun drone_openai yaw_state_rate.py
+rosrun drone_openai yaw_cie.py
