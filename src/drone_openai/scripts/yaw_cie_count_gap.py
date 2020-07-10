@@ -84,17 +84,15 @@ class Yaw(object):
                 frame = deepcopy(self.frame)
                 centroids = detection.detect(frame)
                 if len(centroids)==0: 
-                    print(str(i%10) + ": none")
                     n_none = n_none + 1
                     print("none: " + str(n_none))
                     continue
                 else:
                     cent = centroids[0]
                     self.yaw_angle = control.yaw(cent)
-                    print(str(i%10) + ": " + str(cent[0]) + ", " + str(cent[1]) + ", " + str(self.yaw_angle))
                     n_none = 1
-                    print("none: " + str(n_none))
-                rospy.sleep(time.time() - start_time)
+                    print(str(cent[0]) + ", " + str(cent[1]) + ", " + str(self.yaw_angle))
+                rospy.sleep(0.05)
 
             detect_rate.sleep()
 

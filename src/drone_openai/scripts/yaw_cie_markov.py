@@ -39,8 +39,10 @@ class Yaw(object):
         rospy.init_node('yaw_node', anonymous=True)
         self.yaw_angle = 0.0
         self.yaw_angle_pre = 0.0
-        self.yaw_step = 0.0
-        self.time_none = 0.0
+        self.yaw_angle_step = 0.0
+        self.yaw_angle_cie = 0.0
+        self.yaw_angle_cie_pre = 0.0
+
         self.frame = None
         self.bridge_object = CvBridge()
         
@@ -77,48 +79,49 @@ class Yaw(object):
     
     def yaw_detect(self):
         detect_rate = rospy.Rate(10)
-        i = 0
-        start_time = time.time()
+        n_none = 0
         while not rospy.is_shutdown():
             start_time = time.time()
-            if self.frame is not None:  
-                        
-                i = i+1
+            if self.frame is not None:
                 frame = deepcopy(self.frame)
                 centroids = detection.detect(frame)
                 if len(centroids)==0:
-                    self.time_none = time.time() - start_time
+                    n_none = n_none + 1
+                    self.yaw_angle = self.yaw_angle + self.yaw_angle_step * 0.5
+                    # print("none: " + str(self.yaw_angle))
                     continue
                 else:
                     cent = centroids[0]
                     self.yaw_angle = control.yaw(cent)
-                    print(str(cent[0]) + ", " + str(cent[1]))
 
-                    # if self.time_none != 0.0:
-                    #     self.yaw_step = abs(self.yaw_angle - self.yaw_angle_pre) / self.time_none
-                    # self.yaw_angle_pre = self.yaw_angle
-                    
-                    # # print(str(self.yaw_angle))
-                    # if self.time_none != 0.0:
-                    #     print("moving rate: " + str(self.yaw_step))
+                    if n_none != 0:
+                        self.yaw_angle_step = (self.yaw_angle - self.yaw_angle_pre) / n_none + 1
+                        # print("step: " + str(self.yaw_angle))
+                    self.yaw_angle_pre = self.yaw_angle
+                    n_none = 0
 
-                    # self.time_none = 0.0
-                    rospy.sleep(0.1)
+                    cv2.circle(frame, (320, cent[1]), 3, [0,0,255], -1, cv2.LINE_AA)
+                    cv2.circle(frame, (cent[0], cent[1]), 3, [0,255,0], -1, cv2.LINE_AA)
+
+                cv2.imshow("", frame)
+                cv2.waitKey(1)
+                rospy.sleep(0.05)
                 
             detect_rate.sleep()
-            print(time.time() - start_time)
+            # print(time.time() - start_time)
 
     def yaw_cie(self):
         cie_rate = rospy.Rate(30)
-        i = 0
         state_robot_msg = ModelState()
         state_robot_msg.model_name = 'sjtu_drone'
         while not rospy.is_shutdown():
-            i = i+1
+            start_time = time.time()
             rospy.wait_for_service('/gazebo/set_model_state')
             try:
                 pose.position = self.robot_position
-                # print("CIE: " + str(self.yaw_angle))
+                self.yaw_angle_cie = (self.yaw_angle + self.yaw_angle_cie_pre) / 2
+                self.yaw_angle_cie_pre = self.yaw_angle_cie
+                print("CIE: " + str(self.yaw_angle_cie))
                 pose.orientation = Quaternion(*quaternion_from_euler(0.0, 0.0, self.yaw_angle*pi/180))                  
                 state_robot_msg.pose = pose
 
@@ -127,6 +130,7 @@ class Yaw(object):
                 pass
 
             cie_rate.sleep()
+            # print(time.time() - start_time)
 
     def shutdown(self):
         control.land()
