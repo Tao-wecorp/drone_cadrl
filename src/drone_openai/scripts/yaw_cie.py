@@ -37,7 +37,8 @@ class Yaw(object):
     def __init__(self):
         # Init
         rospy.init_node('yaw_node', anonymous=True)
-        self.rate = rospy.Rate(10)
+        self.yaw_angle = 0.0
+        self.runtime = 0.0
         self.frame = None
         self.bridge_object = CvBridge()
         
@@ -51,15 +52,16 @@ class Yaw(object):
 
         # Takeoff & Land
         control.takeoff()
-        rospy.on_shutdown(self.shutdown)
 
         # Detect yaw
         self.detect_thr = Thread(target=self.yaw_detect, args=())
         self.detect_thr.daemon = True
         self.detect_thr.start()
+        self.yaw_cie()
+
+        rospy.on_shutdown(self.shutdown)
         rospy.spin()
-        
-    
+
     # Methods
     def cam_callback(self,data):
         try:
@@ -85,11 +87,31 @@ class Yaw(object):
                     continue
                 else:
                     cent = centroids[0]
-                    yaw_angle = control.yaw(cent)
-                    print(str(i%10) + ": " + str(cent[0]) + ", " + str(cent[1]) + ", " + str(yaw_angle))
-                rospy.sleep((time.time() - start_time))
+                    self.yaw_angle = control.yaw(cent)
+                    print(str(i%10) + ": " + str(cent[0]) + ", " + str(cent[1]) + ", " + str(self.yaw_angle))
+                rospy.sleep(time.time() - start_time)
 
-            detect_rate.sleep() 
+            detect_rate.sleep()
+
+    def yaw_cie(self):
+        cie_rate = rospy.Rate(30)
+        i = 0
+        state_robot_msg = ModelState()
+        state_robot_msg.model_name = 'sjtu_drone'
+        while not rospy.is_shutdown():
+            i = i+1
+            rospy.wait_for_service('/gazebo/set_model_state')
+            try:
+                pose.position = self.robot_position
+                print("CIE " + str(i%30) + ": " + str(self.yaw_angle))
+                pose.orientation = Quaternion(*quaternion_from_euler(0.0, 0.0, self.yaw_angle*pi/180))                  
+                state_robot_msg.pose = pose
+
+                self.set_state(state_robot_msg)
+            except rospy.ServiceException:
+                pass
+
+            cie_rate.sleep()
 
     def shutdown(self):
         control.land()
