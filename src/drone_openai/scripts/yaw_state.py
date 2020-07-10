@@ -51,25 +51,30 @@ class Yaw(object):
         rospy.on_shutdown(self.shutdown)
 
         # Yaw
+        i = 0
         state_robot_msg = ModelState()
         state_robot_msg.model_name = 'sjtu_drone'
         while not rospy.is_shutdown():
             if self.frame is not None:
+                i = i+1
                 start_time = time.time()
                 frame = deepcopy(self.frame)
                 robot_position = deepcopy(self.robot_position)
                 
                 centroids = detection.detect(frame)
                 if len(centroids)==0: 
+                    print(str(i%10) + ": none")
                     continue
                 else:
                     cent = centroids[0]
                     yaw_angle = control.yaw(cent)
+                    # print(str(i%10) + ": " + str(cent[0]) + ", " + str(cent[1]))
+                    print(str(i%10) + ": " + str(cent[0]) + ", " + str(cent[1]) + ", " + str(yaw_angle))
                     rospy.wait_for_service('/gazebo/set_model_state')
                     try:
                         pose.position = robot_position
                         pose.orientation = Quaternion(*quaternion_from_euler(0.0, 0.0, yaw_angle*pi/180))
-                        print(pose.orientation)                   
+                        # print(pose.orientation)                   
                         state_robot_msg.pose = pose
 
                         self.set_state(state_robot_msg)
@@ -82,7 +87,7 @@ class Yaw(object):
                 cv2.imshow("", frame)
                 cv2.waitKey(1)
                  
-                print("%s seconds" % (time.time() - start_time))
+                # print("%s seconds" % (time.time() - start_time))
                 time.sleep((time.time() - start_time))
                 
             self.rate.sleep()

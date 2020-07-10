@@ -18,6 +18,7 @@ from cvlib.object_detection import draw_bbox
 from math import *
 import numpy as np
 import time
+from threading import Thread
 
 # Helpers
 from helpers.cvlib import Detection
@@ -31,6 +32,7 @@ fpv = [320, 480]
 from helpers.utils.gazebo_connection import GazeboConnection
 gazebo = GazeboConnection()
 
+
 class Yaw(object):
     def __init__(self):
         # Init
@@ -39,6 +41,7 @@ class Yaw(object):
         self.frame = None
         self.bridge_object = CvBridge()
         
+        # self.yaw_cie = 0.0
         self.robot_position = None
 
         # Sub & Pub
@@ -50,42 +53,12 @@ class Yaw(object):
         control.takeoff()
         rospy.on_shutdown(self.shutdown)
 
-        # Yaw
-        state_robot_msg = ModelState()
-        state_robot_msg.model_name = 'sjtu_drone'
-        while not rospy.is_shutdown():
-            if self.frame is not None:
-                start_time = time.time()
-                frame = deepcopy(self.frame)
-                robot_position = deepcopy(self.robot_position)
-                
-                centroids = detection.detect(frame)
-                if len(centroids)==0: 
-                    continue
-                else:
-                    cent = centroids[0]
-                    yaw_angle = control.yaw(cent)
-                    rospy.wait_for_service('/gazebo/set_model_state')
-                    try:
-                        pose.position = robot_position
-                        pose.orientation = Quaternion(*quaternion_from_euler(0.0, 0.0, yaw_angle*pi/180))
-                        print(pose.orientation)                   
-                        state_robot_msg.pose = pose
-
-                        self.set_state(state_robot_msg)
-                    except rospy.ServiceException:
-                        pass
-
-                    cv2.circle(frame, (320, cent[1]), 3, [0,0,255], -1, cv2.LINE_AA)
-                    cv2.circle(frame, (cent[0], cent[1]), 3, [0,255,0], -1, cv2.LINE_AA)
-
-                cv2.imshow("", frame)
-                cv2.waitKey(1)
-                 
-                print("%s seconds" % (time.time() - start_time))
-                time.sleep((time.time() - start_time))
-                
-            self.rate.sleep()
+        # Detect yaw
+        self.detect_thr = Thread(target=self.yaw_detect, args=())
+        self.detect_thr.daemon = True
+        self.detect_thr.start()
+        rospy.spin()
+        
     
     # Methods
     def cam_callback(self,data):
@@ -96,8 +69,28 @@ class Yaw(object):
         self.frame = cv_img
     
     def states_callback(self,data):
-        self.robot_position = data.pose[2].position   
+        self.robot_position = data.pose[-1].position
     
+    def yaw_detect(self):
+        detect_rate = rospy.Rate(10)
+        i = 0
+        while not rospy.is_shutdown():
+            if self.frame is not None:          
+                i = i+1
+                start_time = time.time()
+                frame = deepcopy(self.frame)
+                centroids = detection.detect(frame)
+                if len(centroids)==0: 
+                    print(str(i%10) + ": none")
+                    continue
+                else:
+                    cent = centroids[0]
+                    yaw_angle = control.yaw(cent)
+                    print(str(i%10) + ": " + str(cent[0]) + ", " + str(cent[1]) + ", " + str(yaw_angle))
+                rospy.sleep((time.time() - start_time))
+
+            detect_rate.sleep() 
+
     def shutdown(self):
         control.land()
 
