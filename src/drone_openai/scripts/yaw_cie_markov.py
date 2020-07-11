@@ -87,7 +87,7 @@ class Yaw(object):
                 centroids = detection.detect(frame)
                 if len(centroids)==0:
                     n_none = n_none + 1
-                    self.yaw_angle = self.yaw_angle + self.yaw_angle_step * 0.5
+                    self.yaw_angle = self.yaw_angle + self.yaw_angle_step * 0.6
                     # print("none: " + str(self.yaw_angle))
                     continue
                 else:
@@ -95,7 +95,10 @@ class Yaw(object):
                     self.yaw_angle = control.yaw(cent)
 
                     if n_none != 0:
-                        self.yaw_angle_step = (self.yaw_angle - self.yaw_angle_pre) / n_none + 1
+                        self.yaw_angle_step = (self.yaw_angle - self.yaw_angle_pre) / (n_none + 1)
+                        self.yaw_angle_step = min(self.yaw_angle_step, 1)
+                        self.yaw_angle_step = max(self.yaw_angle_step, -1)
+                        # print("step: " + str(self.yaw_angle_step))
                         # print("step: " + str(self.yaw_angle))
                     self.yaw_angle_pre = self.yaw_angle
                     n_none = 0
@@ -122,7 +125,7 @@ class Yaw(object):
                 self.yaw_angle_cie = (self.yaw_angle + self.yaw_angle_cie_pre) / 2
                 self.yaw_angle_cie_pre = self.yaw_angle_cie
                 print("CIE: " + str(self.yaw_angle_cie))
-                pose.orientation = Quaternion(*quaternion_from_euler(0.0, 0.0, self.yaw_angle*pi/180))                  
+                pose.orientation = Quaternion(*quaternion_from_euler(0.0, 0.0, self.yaw_angle_cie*pi/180))                  
                 state_robot_msg.pose = pose
 
                 self.set_state(state_robot_msg)
