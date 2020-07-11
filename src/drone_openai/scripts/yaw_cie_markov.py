@@ -91,7 +91,6 @@ class Yaw(object):
                         self.yaw_angle = self.yaw_angle + self.yaw_angle_step * 0.9
                     else:
                         self.yaw_angle = self.yaw_angle + self.yaw_angle_step * 1.1
-                    # print("none: " + str(self.yaw_angle))
                     continue
                 else:
                     cent = centroids[0]
@@ -99,10 +98,9 @@ class Yaw(object):
 
                     if n_none != 0:
                         self.yaw_angle_step = (self.yaw_angle - self.yaw_angle_pre) / (n_none + 1)
+                        # avoid overshooting
                         self.yaw_angle_step = min(self.yaw_angle_step, 0.6)
                         self.yaw_angle_step = max(self.yaw_angle_step, -0.6)
-                        # print("step: " + str(self.yaw_angle_step))
-                        # print("step: " + str(self.yaw_angle))
                     self.yaw_angle_pre = self.yaw_angle
                     n_none = 0
 
