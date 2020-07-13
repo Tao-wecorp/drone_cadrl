@@ -38,11 +38,7 @@ class Yaw(object):
         # Init
         rospy.init_node('yaw_node', anonymous=True)
         self.yaw_angle = 0.0
-        self.yaw_angle_pre = 0.0
-        self.yaw_angle_step = 0.0
-        self.yaw_angle_cie = 0.0
-        self.yaw_angle_cie_pre = 0.0
-
+        self.runtime = 0.0
         self.frame = None
         self.bridge_object = CvBridge()
         
@@ -79,71 +75,46 @@ class Yaw(object):
     
     def yaw_detect(self):
         detect_rate = rospy.Rate(10)
+        i = 0
         n_none = 0
         while not rospy.is_shutdown():
-            start_time = time.time()
-            if self.frame is not None:
+            if self.frame is not None:          
+                i = i+1
+                start_time = time.time()
                 frame = deepcopy(self.frame)
                 centroids = detection.detect(frame)
-                if len(centroids)==0: # decision gap
+                if len(centroids)==0: 
                     n_none = n_none + 1
-                    self.yaw_angle = self.yaw_angle + self.yaw_angle_step
-                    # if (self.yaw_angle > 0 and self.yaw_angle_step > 0) or (self.yaw_angle < 0 and self.yaw_angle_step < 0): 
-                    #     self.yaw_angle = self.yaw_angle + self.yaw_angle_step * 1.1
-                    # elif (self.yaw_angle > 0 and self.yaw_angle_step < 0) or (self.yaw_angle < 0 and self.yaw_angle_step > 0):
-                    #     self.yaw_angle = self.yaw_angle + self.yaw_angle_step * 0.9
+                    print("not sure: " + str(n_none + 1))
                     continue
-                else: # decison made
+                else:
                     cent = centroids[0]
-
-                    self.yaw_angle = control.yaw(cent) # perception team's globel yaw
-
-                    if n_none != 0:
-                        self.yaw_angle_step = (self.yaw_angle - self.yaw_angle_pre) / (n_none + 1)
-                        # avoid overshooting
-                        self.yaw_angle_step = min(self.yaw_angle_step, 0.6)
-                        self.yaw_angle_step = max(self.yaw_angle_step, -0.6)
-                    self.yaw_angle_pre = self.yaw_angle
+                    self.yaw_angle = control.yaw(cent)
                     n_none = 0
-
-                    cv2.circle(frame, (320, cent[1]), 3, [0,0,255], -1, cv2.LINE_AA)
-                    cv2.circle(frame, (cent[0], cent[1]), 3, [0,255,0], -1, cv2.LINE_AA)
-
-                cv2.imshow("", frame)
-                cv2.waitKey(1)
+                    print(str(cent[0]) + ", " + str(cent[1]) + ", " + str(self.yaw_angle))
                 rospy.sleep(0.05)
-                
+
             detect_rate.sleep()
-            # print(time.time() - start_time)
 
     def yaw_cie(self):
         cie_rate = rospy.Rate(30)
+        i = 0
         state_robot_msg = ModelState()
         state_robot_msg.model_name = 'sjtu_drone'
-        start_time = time.time()
         while not rospy.is_shutdown():
-            
+            i = i+1
             rospy.wait_for_service('/gazebo/set_model_state')
             try:
                 pose.position = self.robot_position
-
-                # no filters or gaps
-                self.yaw_angle_cie = self.yaw_angle
-                
-                # markov smoothing or filters
-                self.yaw_angle_cie = (self.yaw_angle + self.yaw_angle_cie_pre) / 2
-                self.yaw_angle_cie_pre = self.yaw_angle_cie
-                print("FPS30: " + str(self.yaw_angle_cie))
-
-                pose.orientation = Quaternion(*quaternion_from_euler(0.0, 0.0, self.yaw_angle_cie*pi/180))                  
+                # print("CIE " + str(i%30) + ": " + str(self.yaw_angle))
+                pose.orientation = Quaternion(*quaternion_from_euler(0.0, 0.0, self.yaw_angle*pi/180))                  
                 state_robot_msg.pose = pose
 
                 self.set_state(state_robot_msg)
             except rospy.ServiceException:
                 pass
-            
+
             cie_rate.sleep()
-            
 
     def shutdown(self):
         control.land()
