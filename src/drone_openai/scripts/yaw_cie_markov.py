@@ -85,16 +85,17 @@ class Yaw(object):
             if self.frame is not None:
                 frame = deepcopy(self.frame)
                 centroids = detection.detect(frame)
-                if len(centroids)==0:
+                if len(centroids)==0: # decision gap
                     n_none = n_none + 1
-                    if self.yaw_angle_step > 0: 
-                        self.yaw_angle = self.yaw_angle + self.yaw_angle_step * 0.9
-                    else:
-                        self.yaw_angle = self.yaw_angle + self.yaw_angle_step * 1.1
+                    # if (self.yaw_angle > 0 and self.yaw_angle_step > 0) or (self.yaw_angle < 0 and self.yaw_angle_step < 0): 
+                    #     self.yaw_angle = self.yaw_angle + self.yaw_angle_step * 1.1
+                    # elif (self.yaw_angle > 0 and self.yaw_angle_step < 0) or (self.yaw_angle < 0 and self.yaw_angle_step > 0):
+                    #     self.yaw_angle = self.yaw_angle + self.yaw_angle_step * 0.9
                     continue
-                else:
+                else: # decison made
                     cent = centroids[0]
-                    self.yaw_angle = control.yaw(cent)
+
+                    self.yaw_angle = control.yaw(cent) # perception team's globel yaw
 
                     if n_none != 0:
                         self.yaw_angle_step = (self.yaw_angle - self.yaw_angle_pre) / (n_none + 1)
@@ -118,23 +119,30 @@ class Yaw(object):
         cie_rate = rospy.Rate(30)
         state_robot_msg = ModelState()
         state_robot_msg.model_name = 'sjtu_drone'
+        start_time = time.time()
         while not rospy.is_shutdown():
-            start_time = time.time()
+            
             rospy.wait_for_service('/gazebo/set_model_state')
             try:
                 pose.position = self.robot_position
+
+                # no filters or gaps
+                # self.yaw_angle_cie = self.yaw_angle
+                
+                # markov smoothing or filters
                 self.yaw_angle_cie = (self.yaw_angle + self.yaw_angle_cie_pre) / 2
                 self.yaw_angle_cie_pre = self.yaw_angle_cie
-                print("CIE: " + str(self.yaw_angle_cie))
+                # print("CIE: " + str(self.yaw_angle_cie))
+
                 pose.orientation = Quaternion(*quaternion_from_euler(0.0, 0.0, self.yaw_angle_cie*pi/180))                  
                 state_robot_msg.pose = pose
 
                 self.set_state(state_robot_msg)
             except rospy.ServiceException:
                 pass
-
+            
             cie_rate.sleep()
-            # print(time.time() - start_time)
+            
 
     def shutdown(self):
         control.land()
