@@ -130,7 +130,7 @@ class Yaw(object):
                 # no filters or gaps
                 self.yaw_angle_cie = self.yaw_angle
                 
-                # markov smoothing or filters
+                # # markov smoothing or filters
                 self.yaw_angle_cie = (self.yaw_angle + self.yaw_angle_cie_pre) / 2
                 self.yaw_angle_cie_pre = self.yaw_angle_cie
                 print("FPS30: " + str(self.yaw_angle_cie))
