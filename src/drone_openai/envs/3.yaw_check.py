@@ -8,7 +8,7 @@ import utils.warning_ignore
 from utils.saved_dir import model_dir, log_dir
 
 import yaw_task
-from stable_baselines3.common.env_checker import check_env
+from stable_baselines.common.env_checker import check_env
 
 
 class CheckEnv(yaw_task.SJTUYawEnv):
