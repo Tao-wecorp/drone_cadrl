@@ -8,7 +8,7 @@ import rospy
 import utils.warning_ignore
 from utils.saved_dir import model_dir, log_dir
 
-import yaw_task
+import parrotdrone_goto
 from stable_baselines import PPO2
 from stable_baselines.common.policies import MlpPolicy
 from stable_baselines.common.evaluation import evaluate_policy
@@ -19,7 +19,7 @@ from stable_baselines.common.callbacks import EvalCallback, StopTrainingOnReward
 
 def main():
     rospy.init_node('train_node', anonymous=True)
-    env = gym.make("SJTUYawEnv-v0")
+    env = gym.make("ParrotDroneGoto-v0")
     env = Monitor(env, log_dir)
 
     callback_on_best = StopTrainingOnRewardThreshold(reward_threshold=10, verbose=1)
@@ -28,7 +28,7 @@ def main():
     model = PPO2(MlpPolicy, env, verbose=1, tensorboard_log=log_dir)
     model.learn(total_timesteps=5000, callback=eval_callback, reset_num_timesteps=False)
 
-    model.save(model_dir + "yaw_ppo2")
+    model.save(model_dir + "goto_ppo2")
 
 if __name__ == '__main__':
     main()
