@@ -1,15 +1,5 @@
 drone: #namespace
 
-    #qlearn parameters
-    alpha: 0.1
-    gamma: 0.7
-    epsilon: 0.9
-    epsilon_discount: 0.999
-    nepisodes: 500
-    nsteps: 1000
-    number_splits: 10 #set to change the number of state splits for the continuous problem and also the number of env_variable splits
-
-
     n_actions: 6 # We have 3 actions, Forwards,TurnLeft,TurnRight, STOP
     n_observations: 6 # We have 6 different observations
 
@@ -53,3 +43,14 @@ drone: #namespace
     end_episode_points: 200 # Points given when ending an episode
     
 
+ppO2:
+    normalize: true
+    n_envs: 16
+    n_timesteps: !!float 1e6
+    policy: 'MlpPolicy'
+    n_steps: 256
+    nminibatches: 8
+    lam: 0.94
+    gamma: 0.99
+    noptepochs: 4
+    ent_coef: 0.0
