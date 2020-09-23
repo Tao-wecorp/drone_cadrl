@@ -10,7 +10,7 @@ import rospy
 import utils.warning_ignore
 from utils.saved_dir import model_dir, log_dir
 
-import yaw_task
+import parrotdrone_goto
 from stable_baselines.deepq import DQN, MlpPolicy
 from stable_baselines import results_plotter
 from stable_baselines.results_plotter import load_results, ts2xy
@@ -21,9 +21,9 @@ from stable_baselines.common.vec_env import DummyVecEnv, SubprocVecEnv
 
 def main():
     rospy.init_node('eval_node', anonymous=True)
-    env = gym.make("SJTUYawEnv-v0")
+    env = gym.make("ParrotDroneGoto-v0")
     env = DummyVecEnv([lambda: env])
-    model = PPO2.load(model_dir + "yaw_ppo2", env=env)
+    model = PPO2.load(model_dir + "goto_ppo2", env=env)
 
     obs = env.reset()
     n_steps = 20
