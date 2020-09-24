@@ -28,9 +28,9 @@ def main():
 
     model = PPO2.load(model_dir + "goto_ppo2", tensorboard_log=log_dir)
     model.set_env(env)
-    model.learn(total_timesteps=40000, callback=eval_callback, reset_num_timesteps=False)
+    model.learn(total_timesteps=5000, callback=eval_callback, reset_num_timesteps=False)
 
-    model.save(model_dir + "goto_ppo2")
+    model.save(model_dir + "goto_ppo2_15000")
 
 if __name__ == '__main__':
     main()

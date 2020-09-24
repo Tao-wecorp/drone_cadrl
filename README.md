@@ -44,3 +44,4 @@ rostopic pub -r 10 /cmd_vel geometry_msgs/Twist  '{linear:  {x: 0.0, y: 0.0, z: 
 
 
 tensorboard --logdir '/home/robotics/Workspace/drone_openai/src/drone_openai/envs/logs/PPO2_1'
+tensorboard --logdir '/home/rl/Workspe/drone_openai/src/drone_openai/envs/logs/PPO2_1' 
