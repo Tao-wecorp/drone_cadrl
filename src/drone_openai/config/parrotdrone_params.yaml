@@ -31,7 +31,7 @@ drone: #namespace
     max_yaw: inf # Max yaw, its 4 because its bigger the pi, its a complete turn actually the maximum
     
     desired_pose:
-      x: 9.0
+      x: 4.0
       y: 4.0
       z: 2.0
     

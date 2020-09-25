@@ -141,7 +141,7 @@ devel/
 *.caffemodel
 
 # results
-# src/drone_openai/envs/logs/
+src/drone_openai/envs/logs/
 *.csv
 *.stats.json
 *.manifest.json

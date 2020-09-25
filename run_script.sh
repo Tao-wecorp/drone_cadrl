@@ -1,4 +1,4 @@
 #!/bin/bash
 
 source devel/setup.bash
-rosrun drone_openai goto_ppo2_continual.py
+rosrun drone_openai goto_dqn.py
