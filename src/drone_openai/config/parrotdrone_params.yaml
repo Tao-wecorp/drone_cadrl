@@ -19,7 +19,7 @@ drone: #namespace
     max_sonar_value: 5.0 # This can be retrieved form the sonar topic
     
     work_space: # 3D cube in which Drone is allowed to move
-      x_max: 10.0
+      x_max: 5.0
       x_min: -1.0
       y_max: 5.0
       y_min: -1.0
@@ -31,11 +31,11 @@ drone: #namespace
     max_yaw: inf # Max yaw, its 4 because its bigger the pi, its a complete turn actually the maximum
     
     desired_pose:
-      x: 9.0
+      x: 4.0
       y: 4.0
       z: 2.0
     
-    desired_point_epsilon: 1.0 # Error acceptable to consider that it has reached the desired point
+    desired_point_epsilon: 0.5 # Error acceptable to consider that it has reached the desired point
     
     
     closer_to_point_reward: 10 # We give points for getting closer to the desired point

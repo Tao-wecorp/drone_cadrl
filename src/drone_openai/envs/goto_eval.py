@@ -22,20 +22,20 @@ from stable_baselines.common.vec_env import DummyVecEnv, SubprocVecEnv
 def main():
     rospy.init_node('eval_node', anonymous=True)
     env = gym.make("ParrotDroneGoto-v0")
-    env = DummyVecEnv([lambda: env])
+    obs = env.reset()
     model = PPO2.load(model_dir + "goto_ppo2", env=env)
 
-    obs = env.reset()
-    n_steps = 20
-    for step in range(n_steps):
-        action, _states = model.predict(obs)
-        print("Step {}".format(step + 1))
-        print("Action: ", action)
-        obs, reward, done, info = env.step(action)
-        print('obs=', obs, 'reward=', reward, 'done=', done)
-        if done:
-            print("Goal reached!", "reward=", reward)
-            break
+    # obs = env.reset()
+    # n_steps = 20
+    # for step in range(n_steps):
+    #     action, _states = model.predict(obs)
+    #     print("Step {}".format(step + 1))
+    #     print("Action: ", action)
+    #     obs, reward, done, info = env.step(action)
+    #     print('obs=', obs, 'reward=', reward, 'done=', done)
+    #     if done:
+    #         print("Goal reached!", "reward=", reward)
+    #         break
 
 if __name__ == '__main__':
     main()
