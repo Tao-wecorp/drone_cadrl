@@ -23,32 +23,19 @@ def main():
     env = Monitor(env, log_dir)
     env = DummyVecEnv([lambda: env])
 
-<<<<<<< HEAD
     callback_on_best = StopTrainingOnRewardThreshold(reward_threshold=299, verbose=1)
-=======
-    callback_on_best = StopTrainingOnRewardThreshold(reward_threshold=500, verbose=1)
->>>>>>> a8100eb66ac00d89e202c8939e3959bca9bee346
     eval_callback = EvalCallback(env, callback_on_new_best=callback_on_best, verbose=1)
 
     model = DQN(env=env,
         policy=MlpPolicy,
         learning_rate=1e-3,
         buffer_size=50000,
-<<<<<<< HEAD
         exploration_fraction=0.3,
-=======
-        exploration_fraction=0.1,
->>>>>>> a8100eb66ac00d89e202c8939e3959bca9bee346
         exploration_final_eps=0.02,
         verbose=1, 
         tensorboard_log=log_dir
     )
-<<<<<<< HEAD
     model.learn(total_timesteps=10000, callback=eval_callback, reset_num_timesteps=False)
-=======
-    model.learn(total_timesteps=1000000, callback=eval_callback, reset_num_timesteps=False)
->>>>>>> a8100eb66ac00d89e202c8939e3959bca9bee346
-
     model.save(model_dir + "goto_dqn")
 
 if __name__ == '__main__':
