@@ -5,6 +5,12 @@ sudo add-apt-repository "deb http://ppa.launchpad.net/nemh/systemback/ubuntu xen
 sudo apt update -y
 sudo apt install systemback -y
 
+# Install nvidia drivers
+sudo dpkg -P $(dpkg -l | grep nvidia-driver | awk '{print $2}')
+sudo apt autoremove
+sudo reboot
+sudo ubuntu-drivers autoinstall
+
 # Install cuda 10.2 
 # https://medium.com/@sh.tsang/tutorial-cuda-v10-2-cudnn-v7-6-5-installation-ubuntu-18-04-3d24c157473f
 wget http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_linux.run
@@ -32,7 +38,6 @@ echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
 echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/ros/melodic/lib" >> ~/.bashrc
 source ~/.bashrc
 sudo apt install python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential ros-melodic-ros-control ros-melodic-ros-controllers ros-melodic-joint-state-publisher-gui ros-melodic-teleop-twist-keyboard ffmpeg freeglut3-dev xvfb -y
-sudo apt install python-rosdep
 pip3 install empy
 sudo rosdep init
 rosdep update
@@ -90,7 +95,7 @@ cmake -D CMAKE_BUILD_TYPE=RELEASE \
 	-D OPENCV_DNN_CUDA=ON \
 	-D ENABLE_FAST_MATH=1 \
 	-D CUDA_FAST_MATH=1 \
-	-D CUDA_ARCH_BIN=7.0 \
+	-D CUDA_ARCH_BIN=6.1 \
 	-D WITH_CUBLAS=1 \
 	-D OPENCV_EXTRA_MODULES_PATH=~/Installers/opencv_contrib/modules \
 	-D HAVE_opencv_python3=ON \
@@ -106,6 +111,8 @@ sudo ldconfig
 ls -l /usr/local/lib/python3.6/site-packages/cv2/python-3.6
 cd ~/.virtualenvs/baselines/lib/python3.6/site-packages/
 ln -s /usr/local/lib/python3.6/site-packages/cv2/python-3.6/cv2.cpython-36m-x86_64-linux-gnu.so cv2.so
+
+python3 -c "import cv2; count = cv2.cuda.getCudaEnabledDeviceCount(); print(count)" 
 
 # Install baselines
 sudo apt remove python3-dateutil -y
