@@ -1,4 +1,4 @@
 #!/bin/bash
 
 source devel/setup.bash
-rosrun drone_openai goto_dqn.py
+rosrun drone_openai yaw_pid.py
