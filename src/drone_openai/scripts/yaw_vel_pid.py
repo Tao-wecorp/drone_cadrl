@@ -18,6 +18,9 @@ from math import *
 import numpy as np
 import time
 
+from simple_pid import PID
+pid = PID(0.2,0,0,setpoint=0)
+
 from helpers.cvlib import Detection
 detection = Detection()
 
@@ -30,7 +33,6 @@ class Yaw(object):
     def __init__(self):
         rospy.init_node('yaw_node', anonymous=True)
         self.rate = rospy.Rate(10)
-        self.current_yaw = 0.0
 
         rospy.Subscriber("/drone/front_camera/image_raw",Image,self.cam_callback)
         self.bridge_object = CvBridge()
@@ -53,9 +55,8 @@ class Yaw(object):
                 else:
                     cent = centroids[0]
                     yaw_angle = degrees(atan(float(fpv[0]-cent[0])/(fpv[1]-cent[1])))
-                    yaw_angular_z = yaw_angle
-            
-                    self.move_msg.angular.z =  0.2*yaw_angular_z
+                    print(yaw_angle ,pid(yaw_angle))
+                    self.move_msg.angular.z =  pid(yaw_angle)
                     self.pub_cmd_vel.publish(self.move_msg)                 
 
                     cv2.circle(frame, (320, cent[1]), 3, [0,0,255], -1, cv2.LINE_AA)
@@ -75,6 +76,7 @@ class Yaw(object):
     
     def shutdown(self):
         control.land()
+        
 
 def main():
     try:
