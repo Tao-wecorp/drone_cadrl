@@ -18,9 +18,6 @@ from math import *
 import numpy as np
 import time
 
-from simple_pid import PID
-pid = PID(0.2,0,0,setpoint=0)
-
 from helpers.cvlib import Detection
 detection = Detection()
 
@@ -55,9 +52,14 @@ class Yaw(object):
                 else:
                     cent = centroids[0]
                     yaw_angle = degrees(atan(float(fpv[0]-cent[0])/(fpv[1]-cent[1])))
-                    print(yaw_angle ,pid(yaw_angle))
-                    self.move_msg.angular.z =  pid(yaw_angle)
-                    self.pub_cmd_vel.publish(self.move_msg)                 
+
+                    if yaw_angle > 9: yaw_angle_z = 90
+                    elif yaw_angle < -9: yaw_angle_z = -90
+                    else: yaw_angle_z = 0
+                    
+                    self.move_msg.angular.z = yaw_angle_z
+                    self.pub_cmd_vel.publish(self.move_msg)
+                    time.sleep(abs(yaw_angle_pid)/90)         
 
                     cv2.circle(frame, (320, cent[1]), 3, [0,0,255], -1, cv2.LINE_AA)
                     cv2.circle(frame, (cent[0], cent[1]), 3, [0,255,0], -1, cv2.LINE_AA)

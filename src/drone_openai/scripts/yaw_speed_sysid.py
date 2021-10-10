@@ -29,7 +29,7 @@ fpv = [320, 480]
 class Yaw(object):
     def __init__(self):
         rospy.init_node('yaw_node', anonymous=True)
-        self.rate = rospy.Rate(10)
+        self.rate = rospy.Rate(1)
         self.current_yaw = 0.0
 
         rospy.Subscriber("/drone/front_camera/image_raw",Image,self.cam_callback)

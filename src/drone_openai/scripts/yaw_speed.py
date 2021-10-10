@@ -21,9 +21,6 @@ import time
 from helpers.cvlib import Detection
 detection = Detection()
 
-from simple_pid import PID
-pid = PID(0.35,0.2,0.2,setpoint=0,output_limits=(-100,100))
-
 from helpers.control import Control
 control = Control()
 fpv = [320, 480]
@@ -32,14 +29,12 @@ fpv = [320, 480]
 class Yaw(object):
     def __init__(self):
         rospy.init_node('yaw_node', anonymous=True)
-        self.rate = rospy.Rate(1)
-        self.current_yaw = 0.0
+        self.rate = rospy.Rate(10)
 
         rospy.Subscriber("/drone/front_camera/image_raw",Image,self.cam_callback)
         self.bridge_object = CvBridge()
         self.frame = None
 
-        rospy.Subscriber ('/drone/gt_pose', Pose, self.pose_callback)
         self.pub_cmd_vel = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
         self.move_msg = Twist()
 
@@ -48,20 +43,27 @@ class Yaw(object):
 
         while not rospy.is_shutdown():
             if self.frame is not None:
-                start_time = time.time()
                 frame = deepcopy(self.frame)
-                current_yaw = deepcopy(self.current_yaw)
                 
                 centroids = detection.detect(frame)
-                if len(centroids)==0: 
-                    continue
+                if len(centroids)==0:
+                    self.move_msg.angular.z = 0
+                    self.pub_cmd_vel.publish(self.move_msg)
                 else:
                     cent = centroids[0]
                     yaw_angle = degrees(atan(float(fpv[0]-cent[0])/(fpv[1]-cent[1])))
-                    yaw_angular_z = yaw_angle*pi/180 - current_yaw
-                    print(yaw_angular_z, pid(yaw_angular_z))
 
-                    self.move_msg.angular.z =  pid(yaw_angular_z)
+                    # ROS rate at 10 HZ and Yaw speed at 90 deg/s
+                    # ROS rate can be interrupted by internal processes (sensor processing)
+                    # Yaw speed can be interrupted by both internal (battery) and external conditions (wind)
+                    # System Identification
+                    if yaw_angle > 9: yaw_angle_z = 90
+                    elif yaw_angle < -9: yaw_angle_z = -90
+                    elif yaw_angle < 9 and yaw_angle > 0: yaw_angle_z = yaw_angle * 10
+                    elif yaw_angle < 0 and yaw_angle > -9: yaw_angle_z = yaw_angle * 10
+                    else: yaw_angle_z = 0
+
+                    self.move_msg.angular.z = yaw_angle_z
                     self.pub_cmd_vel.publish(self.move_msg)
 
                     cv2.circle(frame, (320, cent[1]), 3, [0,0,255], -1, cv2.LINE_AA)
@@ -70,9 +72,6 @@ class Yaw(object):
                 cv2.imshow("", frame)
                 cv2.waitKey(1)
                  
-                # print("%s seconds" % (time.time() - start_time))
-                time.sleep((time.time() - start_time))
-
             self.rate.sleep()
     
     def cam_callback(self,data):
@@ -81,13 +80,10 @@ class Yaw(object):
         except CvBridgeError as e:
             print(e)
         self.frame = cv_img
-
-    def pose_callback(self, data):
-        orientation = data.orientation
-        self.current_yaw = euler_from_quaternion([orientation.x, orientation.y, orientation.z, orientation.w])[2]
     
     def shutdown(self):
         control.land()
+        
 
 def main():
     try:
