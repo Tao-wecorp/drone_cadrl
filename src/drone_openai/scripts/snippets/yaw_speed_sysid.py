@@ -60,7 +60,6 @@ class Yaw(object):
                     self.move_msg.angular.z = 0
                     self.pub_cmd_vel.publish(self.move_msg)
                     
-                    
                 self.frame_id = self.frame_id + 1
 
             self.rate.sleep()
