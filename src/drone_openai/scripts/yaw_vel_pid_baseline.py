@@ -24,8 +24,9 @@ detection = Detection()
 
 from helpers.control import Control
 control = Control()
-fpv = [320, 480]
 hz = 10
+fpv = [320, 480]
+pid = [0.4, 0.4, 0]
 
 
 class Yaw(object):
@@ -36,13 +37,12 @@ class Yaw(object):
         rospy.Subscriber("/drone/front_camera/image_raw",Image,self.cam_callback)
         self.bridge_object = CvBridge()
         self.frame = None
-        
+
         self.pub_cmd_vel = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
         self.move_msg = Twist()
-        self.yaw_angle = 0
 
+        self.prev_yaw_angle = 0
         self.frame_id = 0
-        self.kp = 1
         self.yaw_logs = []
 
         control.takeoff()
@@ -50,38 +50,36 @@ class Yaw(object):
 
         while not rospy.is_shutdown():
             if self.frame is not None:
-
                 frame = deepcopy(self.frame)
-                centroids = detection.detect(frame)
 
+                centroids = detection.detect(frame)
                 if len(centroids)==0:
                     self.move_msg.angular.z = 0
                     self.pub_cmd_vel.publish(self.move_msg)
                 else:
                     cent = centroids[0]
-                    self.yaw_angle = degrees(atan(float(fpv[0]-cent[0])/(fpv[1]-cent[1])))
+                    yaw_angle = degrees(atan(float(fpv[0]-cent[0])/(fpv[1]-cent[1])))
+                    self.prev_yaw_angle = yaw_angle
+                    yaw_angle_pid = pid[0]*yaw_angle + pid[1]*(yaw_angle-self.prev_yaw_angle)
 
-                    yaw_vel = radians(self.yaw_angle) * hz
-                    self.move_msg.angular.z = yaw_vel
+                    self.move_msg.angular.z = radians(yaw_angle_pid) * hz
                     self.pub_cmd_vel.publish(self.move_msg)
 
-                
                 log_length = 250
                 if self.frame_id < log_length:
-                    self.yaw_logs.append(self.yaw_angle)
+                    self.yaw_logs.append(self.prev_yaw_angle)
                     
                 if self.frame_id == log_length:
-                    # No PID: 14.68 std
-                    print("Baseline done")
+                    # No PID: 9.93 std
+                    print("PID Baseline done")
                     yaw_logs_preprocessing = np.trim_zeros(np.array(self.yaw_logs))
                     std = statistics.stdev(yaw_logs_preprocessing)
                     print(std)
 
-                self.frame_id = self.frame_id + 1             
+                self.frame_id = self.frame_id + 1
 
             self.rate.sleep()
     
-
     def cam_callback(self,data):
         try:
             cv_img = self.bridge_object.imgmsg_to_cv2(data, desired_encoding="bgr8")
