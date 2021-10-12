@@ -46,13 +46,12 @@ class Yaw(object):
 
         while not rospy.is_shutdown():
             if self.frame is not None:
-                self.move_msg.angular.z = 0.349 # 0.349 (20 deg/s) or 0.524 (30 deg/s)
+                self.move_msg.angular.z = 0.157 # 9 deg/s
                 self.pub_cmd_vel.publish(self.move_msg)
-                # time.sleep(1)
 
-                if self.frame_id == 10 or self.frame_id == 20 or self.frame_id == 30 or self.frame_id == 40:                   
+                if self.frame_id == 10 or self.frame_id == 20 or self.frame_id == 30 or self.frame_id == 40:
                     print("current yaw", degrees(self.current_yaw))
-                    
+
                 self.frame_id = self.frame_id + 1
 
             self.rate.sleep()
