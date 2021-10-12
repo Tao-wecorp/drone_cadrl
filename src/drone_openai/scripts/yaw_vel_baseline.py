@@ -25,7 +25,6 @@ detection = Detection()
 from helpers.control import Control
 control = Control()
 fpv = [320, 480]
-kp = 0.5
 hz = 10
 
 
