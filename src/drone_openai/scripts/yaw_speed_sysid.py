@@ -46,19 +46,12 @@ class Yaw(object):
 
         while not rospy.is_shutdown():
             if self.frame is not None:
-                if self.frame_id == 0:
-                    print("current yaw", self.current_yaw*180/pi)
-                if self.frame_id == 10 or self.frame_id == 20 or self.frame_id == 30 or self.frame_id == 40:
-                    print("Yaw 90 degree")
-                    # Yaw speed: 90 deg/sec -> rospy.Rate 1HZ or time.sleep(1) to yaw 90 degree
-                    # Using time sleep will interrupt ros frequency
-                    self.move_msg.angular.z = 90
-                    self.pub_cmd_vel.publish(self.move_msg)
-                    time.sleep(1)
-                    print("current yaw", self.current_yaw*180/pi)
-                else:
-                    self.move_msg.angular.z = 0
-                    self.pub_cmd_vel.publish(self.move_msg)
+                self.move_msg.angular.z = 0.349 # 0.349 (20 deg/s) or 0.524 (30 deg/s)
+                self.pub_cmd_vel.publish(self.move_msg)
+                # time.sleep(1)
+
+                if self.frame_id == 10 or self.frame_id == 20 or self.frame_id == 30 or self.frame_id == 40:                   
+                    print("current yaw", degrees(self.current_yaw))
                     
                 self.frame_id = self.frame_id + 1
 
@@ -77,7 +70,7 @@ class Yaw(object):
     
     def shutdown(self):
         control.land()
-        print("current yaw", self.current_yaw*180/pi)
+
 
 def main():
     try:

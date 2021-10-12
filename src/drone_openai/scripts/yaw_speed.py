@@ -54,17 +54,7 @@ class Yaw(object):
                     cent = centroids[0]
                     yaw_angle = degrees(atan(float(fpv[0]-cent[0])/(fpv[1]-cent[1])))
 
-                    # ROS rate at 10 HZ and Yaw speed at 90 deg/s
-                    # ROS rate can be interrupted by internal processes (sensor processing)
-                    # Yaw speed can be interrupted by both internal (battery) and external conditions (wind)
-                    # System Identification
-                    if yaw_angle > 9: yaw_angle_z = 90
-                    elif yaw_angle < -9: yaw_angle_z = -90
-                    elif yaw_angle < 9 and yaw_angle > 0: yaw_angle_z = yaw_angle * 10
-                    elif yaw_angle < 0 and yaw_angle > -9: yaw_angle_z = yaw_angle * 10
-                    else: yaw_angle_z = 0
-
-                    self.move_msg.angular.z = yaw_angle_z
+                    self.move_msg.angular.z = 0
                     self.pub_cmd_vel.publish(self.move_msg)
 
                     cv2.circle(frame, (320, cent[1]), 3, [0,0,255], -1, cv2.LINE_AA)
