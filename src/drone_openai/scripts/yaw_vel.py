@@ -54,7 +54,7 @@ class Yaw(object):
                     cent = centroids[0]
                     yaw_angle = degrees(atan(float(fpv[0]-cent[0])/(fpv[1]-cent[1])))
 
-                    self.move_msg.angular.z = 0
+                    self.move_msg.angular.z = radians(yaw_angle)
                     self.pub_cmd_vel.publish(self.move_msg)
 
                     cv2.circle(frame, (320, cent[1]), 3, [0,0,255], -1, cv2.LINE_AA)
