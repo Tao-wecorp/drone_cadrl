@@ -70,7 +70,7 @@ class Yaw(object):
                     self.yaw_logs.append(self.prev_yaw_angle)
                     
                 if self.frame_id == log_length:
-                    # No PID: 9.93 std
+                    # No PID: 9.42 ~ 10.23 std
                     print("PID Baseline done")
                     yaw_logs_preprocessing = np.trim_zeros(np.array(self.yaw_logs))
                     std = statistics.stdev(yaw_logs_preprocessing)
