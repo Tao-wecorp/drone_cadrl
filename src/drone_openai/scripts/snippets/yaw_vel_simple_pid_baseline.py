@@ -28,7 +28,7 @@ hz = 10
 fpv = [320, 480]
 
 from simple_pid import PID
-pid = PID(0.4,0,0.4,setpoint=0,sample_time=0.1)
+pid = PID(0.4,0.2,0.4, setpoint=0, sample_time=0.1)
 
 class Yaw(object):
     def __init__(self):
@@ -59,10 +59,12 @@ class Yaw(object):
                     self.pub_cmd_vel.publish(self.move_msg)
                 else:
                     cent = centroids[0]
-                    yaw_angle = degrees(atan(float(fpv[0]-cent[0])/(fpv[1]-cent[1])))
-                    self.yaw_angle_pid = pid(yaw_angle)
+                    error = float(fpv[0]-cent[0])
+                    self.error_pid = pid(error)
 
-                    self.move_msg.angular.z = radians(self.yaw_angle_pid) * hz
+                    self.yaw_angle_pid = degrees(atan(float(self.error_pid/240)))
+
+                    self.move_msg.angular.z = radians(self.error_pid) * hz
                     self.pub_cmd_vel.publish(self.move_msg)
 
                 log_length = 250

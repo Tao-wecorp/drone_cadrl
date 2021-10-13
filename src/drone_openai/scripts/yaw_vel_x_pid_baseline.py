@@ -42,8 +42,7 @@ class Yaw(object):
         self.pub_cmd_vel = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
         self.move_msg = Twist()
 
-        self.prev_yaw_angle = 0
-        self.integral_yaw_angle = 0
+        self.prev_error = 0
         self.yaw_angle_pid = 0
         self.frame_id = 0
         self.yaw_logs = []
@@ -65,14 +64,14 @@ class Yaw(object):
                     self.pub_cmd_vel.publish(self.move_msg)
                 else:
                     cent = centroids[0]
-                    yaw_angle = degrees(atan(float(fpv[0]-cent[0])/(fpv[1]-cent[1])))
-                    self.prev_yaw_angle = yaw_angle
-                    self.integral_yaw_angle = self.integral_yaw_angle + yaw_angle
+                    error = fpv[0]-cent[0]
+                    self.prev_error = error
 
-                    P = pid[0]*yaw_angle
-                    I = I + pid[1]*yaw_angle*interval
-                    D = pid[2]*(yaw_angle-self.prev_yaw_angle)/interval
-                    self.yaw_angle_pid = P + I + D
+                    P = pid[0]*error
+                    I = I + pid[1]*error*interval
+                    D = pid[2]*(error-self.prev_error)/interval                    
+                    
+                    self.yaw_angle_pid = degrees(atan(float(P+I+D)/(fpv[1]-cent[1])))
 
                     self.move_msg.angular.z = radians(self.yaw_angle_pid)*hz
                     self.pub_cmd_vel.publish(self.move_msg)
@@ -83,7 +82,7 @@ class Yaw(object):
                     
                 if self.frame_id == log_length:
                     # No PID: 9.42 ~ 10.23 std
-                    # Angle PID: 4.62 std
+                    # X PID: 4.53 std
                     print("PID Baseline done")
                     print(self.yaw_logs)
                     yaw_logs_preprocessing = np.trim_zeros(np.array(self.yaw_logs))
