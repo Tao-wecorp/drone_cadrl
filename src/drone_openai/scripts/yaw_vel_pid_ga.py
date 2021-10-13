@@ -60,6 +60,7 @@ class Yaw(object):
 
                 centroids = detection.detect(frame)
                 if len(centroids)==0:
+                    # To-do: fill in gaps
                     self.move_msg.angular.z = 0
                     self.pub_cmd_vel.publish(self.move_msg)
                 else:
@@ -107,3 +108,8 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+# The proportional term (Kp*proportional_error): helps us to reduce the rise time. 
+# The integral term(Ki*integral_error): helps us to reduce any steady-state error.
+# The derivative term(Kd*derivative_error): helps us to prevents any overshoot.
