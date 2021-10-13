@@ -25,10 +25,10 @@ detection = Detection()
 from helpers.control import Control
 control = Control()
 hz = 10
-interval = 1/hz
 fpv = [320, 480]
-pid = [0.4, 0.1, 0.4]
 
+from simple_pid import PID
+pid = PID(0.4,0,0.4,setpoint=0,sample_time=0.1)
 
 class Yaw(object):
     def __init__(self):
@@ -42,15 +42,9 @@ class Yaw(object):
         self.pub_cmd_vel = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
         self.move_msg = Twist()
 
-        self.prev_yaw_angle = 0
-        self.total_yaw_angle = 0
         self.yaw_angle_pid = 0
         self.frame_id = 0
         self.yaw_logs = []
-
-        P = 0
-        I = 0
-        D = 0
 
         control.takeoff()
         rospy.on_shutdown(self.shutdown)
@@ -66,15 +60,9 @@ class Yaw(object):
                 else:
                     cent = centroids[0]
                     yaw_angle = degrees(atan(float(fpv[0]-cent[0])/(fpv[1]-cent[1])))
-                    self.prev_yaw_angle = yaw_angle
-                    self.total_yaw_angle = self.total_yaw_angle + yaw_angle
+                    self.yaw_angle_pid = pid(yaw_angle)
 
-                    P = pid[0]*yaw_angle
-                    I = I + pid[1]*yaw_angle*interval
-                    D = pid[2]*(yaw_angle-self.prev_yaw_angle)/interval
-                    self.yaw_angle_pid = P + I + D
-
-                    self.move_msg.angular.z = radians(self.yaw_angle_pid)*hz
+                    self.move_msg.angular.z = radians(self.yaw_angle_pid) * hz
                     self.pub_cmd_vel.publish(self.move_msg)
 
                 log_length = 250
@@ -82,10 +70,10 @@ class Yaw(object):
                     self.yaw_logs.append(self.yaw_angle_pid)
                     
                 if self.frame_id == log_length:
-                    # No PID: 9.42 ~ 10.23 std
+                    # Simple PID: 9.42 ~ 10.23 std
                     print("PID Baseline done")
-                    print(self.yaw_logs)
                     yaw_logs_preprocessing = np.trim_zeros(np.array(self.yaw_logs))
+                    print(self.yaw_logs)
                     std = statistics.stdev(yaw_logs_preprocessing)
                     print(std)
 
