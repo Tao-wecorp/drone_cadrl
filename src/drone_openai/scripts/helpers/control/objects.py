@@ -50,9 +50,3 @@ class Control:
         self._move_msg.linear.x = 1.0
         self._move_msg.angular.z = 0.0
         self_pub_cmd_vel.publish(self._move_msg)
-
-    def yaw(self, position):
-        new_goal = degrees(atan(float(320-position[0])/(480-position[1])))
-        yaw = new_goal + self.goal
-        self.goal = yaw
-        return yaw
