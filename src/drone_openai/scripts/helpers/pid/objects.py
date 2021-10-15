@@ -1,13 +1,14 @@
 #! /usr/bin/env python
 
 class PID:
-    def __init__(self):
+    def __init__(self, ros_rate=10):
+        self.ros_rate = ros_rate
         self.prev_error = 0
         self.I = 0
 
-    def update(self, pid_params, ros_rate, current_val, target_val):
+    def update(self, pid_params, current_val, target_val):
         error = current_val - target_val
-        interval = 1/ros_rate
+        interval = 1/self.ros_rate
         self.prev_error = error
 
         P = pid_params[0]*error

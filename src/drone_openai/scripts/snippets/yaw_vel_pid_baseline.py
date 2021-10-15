@@ -29,7 +29,7 @@ hz = 10
 from helpers.pid import PID
 pid = PID()
 fpv = [320, 480]
-pid_params = [0.4, 0.05, 0.4]
+pid_params = [0.4, 0, 0.5] # [0.4, 0.05, 0.4]
 
 
 class Yaw(object):
@@ -46,6 +46,7 @@ class Yaw(object):
 
         self.yaw_angle_pid = 0
         self.frame_id = 0
+        self.yaw_logs = []
 
         control.takeoff()
         rospy.on_shutdown(self.shutdown)
@@ -57,21 +58,30 @@ class Yaw(object):
                 centroids = detection.detect(frame)
                 if len(centroids)==0:
                     # To-do: fill in gaps
-                    self.move_msg.angular.z = 0
-                    self.pub_cmd_vel.publish(self.move_msg)
+                    self.yaw_angle_pid = 0
                 else:
                     cent = centroids[0]
+
                     pid_x = pid.update(pid_params, fpv[0], cent[0])
                     self.yaw_angle_pid = degrees(atan(pid_x/(fpv[1]-cent[1])))
 
-                    self.move_msg.angular.z = radians(self.yaw_angle_pid)*hz
-                    self.pub_cmd_vel.publish(self.move_msg)
+                self.move_msg.angular.z = radians(self.yaw_angle_pid)*hz
+                self.pub_cmd_vel.publish(self.move_msg)
 
-                    cv2.circle(frame, (320, cent[1]), 3, [0,0,255], -1, cv2.LINE_AA)
-                    cv2.circle(frame, (cent[0], cent[1]), 3, [0,255,0], -1, cv2.LINE_AA)
+                log_length = 250
+                if self.frame_id < log_length:
+                    self.yaw_logs.append(self.yaw_angle_pid)
+                    
+                if self.frame_id == log_length:
+                    # No PID: 9.42 ~ 10.23 std
+                    # X PID: 2.28 std
+                    print("PID STD Baseline")
+                    # print(self.yaw_logs)
+                    yaw_logs_preprocessing = np.trim_zeros(np.array(self.yaw_logs))
+                    std = statistics.stdev(yaw_logs_preprocessing)
+                    print(std)
 
-                cv2.imshow("", frame)
-                cv2.waitKey(1)
+                self.frame_id = self.frame_id + 1
 
             self.rate.sleep()
     
@@ -97,8 +107,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-# PID
-# The proportional term (Kp*proportional_error): helps us to reduce the rise time. 
-# The integral term(Ki*integral_error): helps us to reduce any steady-state error.
-# The derivative term(Kd*derivative_error): helps us to prevents any overshoot.
