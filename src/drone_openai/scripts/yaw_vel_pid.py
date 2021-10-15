@@ -109,7 +109,7 @@ def main():
 if __name__ == '__main__':
     main()
 
-
+# PID
 # The proportional term (Kp*proportional_error): helps us to reduce the rise time. 
 # The integral term(Ki*integral_error): helps us to reduce any steady-state error.
 # The derivative term(Kd*derivative_error): helps us to prevents any overshoot.

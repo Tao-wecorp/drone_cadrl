@@ -113,3 +113,10 @@ if __name__ == '__main__':
 # The proportional term (Kp*proportional_error): helps us to reduce the rise time. 
 # The integral term(Ki*integral_error): helps us to reduce any steady-state error.
 # The derivative term(Kd*derivative_error): helps us to prevents any overshoot.
+
+# GA
+# Create an Initial population
+# Defining a fitness function
+# Selection
+# Crossover
+# Mutation
