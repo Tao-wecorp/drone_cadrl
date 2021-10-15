@@ -65,16 +65,19 @@ class Yaw(object):
                 else:
                     cent = centroids[0]
 
+                    # pid control
                     pid_x = pid.update(pid_params, fpv[0], cent[0])
                     self.yaw_angle_pid = degrees(atan(pid_x/(fpv[1]-cent[1])))
 
                     self.move_msg.angular.z = radians(self.yaw_angle_pid)*hz
                     self.pub_cmd_vel.publish(self.move_msg)
 
-                live_plot = plot.update()
+                    # live plotting
+                    angle_diff = degrees(atan((fpv[0]-cent[0])/(fpv[1]-cent[1])))
+                    live_plot = plot.update(angle_diff)
 
-                cv2.imshow("", live_plot)
-                cv2.waitKey(1)
+                    cv2.imshow("", live_plot)
+                    cv2.waitKey(1)
 
                 # log_length = 250
                 # if self.frame_id < log_length:
