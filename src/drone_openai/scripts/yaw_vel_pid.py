@@ -25,9 +25,11 @@ detection = Detection()
 from helpers.control import Control
 control = Control()
 hz = 10
-interval = 1/hz
+
+from helpers.pid import PID
+pid = PID()
 fpv = [320, 480]
-pid = [0.4, 0.05, 0.4]
+pid_params = [0.4, 0.05, 0.4]
 
 
 class Yaw(object):
@@ -42,14 +44,8 @@ class Yaw(object):
         self.pub_cmd_vel = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
         self.move_msg = Twist()
 
-        self.prev_error = 0
         self.yaw_angle_pid = 0
         self.frame_id = 0
-        self.yaw_logs = []
-
-        P = 0
-        I = 0
-        D = 0
 
         control.takeoff()
         rospy.on_shutdown(self.shutdown)
@@ -65,15 +61,8 @@ class Yaw(object):
                     self.pub_cmd_vel.publish(self.move_msg)
                 else:
                     cent = centroids[0]
-                    error = fpv[0]-cent[0]
-                    self.prev_error = error
-
-                    P = error
-                    I += error*interval
-                    D = (error-self.prev_error)/interval
-                    PID = pid[0]*error + pid[1]*I + pid[2]*D              
-                    
-                    self.yaw_angle_pid = degrees(atan(float(PID)/(fpv[1]-cent[1])))
+                    pid_x = pid.update(pid_params, hz, fpv[0], cent[0])
+                    self.yaw_angle_pid = degrees(atan(pid_x/(fpv[1]-cent[1])))
 
                     self.move_msg.angular.z = radians(self.yaw_angle_pid)*hz
                     self.pub_cmd_vel.publish(self.move_msg)
