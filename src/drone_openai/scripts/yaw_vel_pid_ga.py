@@ -25,9 +25,14 @@ detection = Detection()
 from helpers.control import Control
 control = Control()
 hz = 10
-interval = 1/hz
+
+from helpers.pid import PID
+pid = PID()
 fpv = [320, 480]
-pid = [0.4, 0.05, 0.4]
+pid_params = [0.4, 0, 0.5] # [0.4, 0.05, 0.4]
+
+from helpers.plot import Plot
+plot = Plot()
 
 
 class Yaw(object):
@@ -42,14 +47,9 @@ class Yaw(object):
         self.pub_cmd_vel = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
         self.move_msg = Twist()
 
-        self.prev_error = 0
         self.yaw_angle_pid = 0
         self.frame_id = 0
         self.yaw_logs = []
-
-        P = 0
-        I = 0
-        D = 0
 
         control.takeoff()
         rospy.on_shutdown(self.shutdown)
@@ -60,29 +60,29 @@ class Yaw(object):
 
                 centroids = detection.detect(frame)
                 if len(centroids)==0:
-                    # To-do: fill in gaps
                     self.move_msg.angular.z = 0
                     self.pub_cmd_vel.publish(self.move_msg)
                 else:
                     cent = centroids[0]
-                    error = fpv[0]-cent[0]
-                    self.prev_error = error
 
-                    P = error
-                    I += error*interval
-                    D = (error-self.prev_error)/interval
-                    PID = pid[0]*error + pid[1]*I + pid[2]*D              
-                    
-                    self.yaw_angle_pid = degrees(atan(float(PID)/(fpv[1]-cent[1])))
+                    # pid control
+                    pid_x = pid.update(pid_params, fpv[0], cent[0])
+                    self.yaw_angle_pid = degrees(atan(pid_x/(fpv[1]-cent[1])))
 
                     self.move_msg.angular.z = radians(self.yaw_angle_pid)*hz
                     self.pub_cmd_vel.publish(self.move_msg)
 
-                    cv2.circle(frame, (320, cent[1]), 3, [0,0,255], -1, cv2.LINE_AA)
-                    cv2.circle(frame, (cent[0], cent[1]), 3, [0,255,0], -1, cv2.LINE_AA)
+                    # live plotting
+                    log_length = 90
+                    if self.frame_id < log_length:
+                        angle_diff = degrees(atan((fpv[0]-cent[0])/(fpv[1]-cent[1])))
+                        live_plot = plot.update(angle_diff)
 
-                cv2.imshow("", frame)
-                cv2.waitKey(1)
+                        cv2.imshow("", live_plot)
+                        cv2.waitKey(1)
+                    
+                    self.frame_id = self.frame_id + 1
+                    
 
             self.rate.sleep()
     
@@ -108,15 +108,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-# The proportional term (Kp*proportional_error): helps us to reduce the rise time. 
-# The integral term(Ki*integral_error): helps us to reduce any steady-state error.
-# The derivative term(Kd*derivative_error): helps us to prevents any overshoot.
-
-# GA
-# Create an Initial population
-# Defining a fitness function
-# Selection
-# Crossover
-# Mutation
