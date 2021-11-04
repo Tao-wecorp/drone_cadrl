@@ -3,7 +3,7 @@
     <rosparam command="load" file="$(find drone_openai)/config/parrotdrone_params.yaml" />
     <!-- <include file="$(find teleop_twist_joy)/launch/teleop.launch"/> -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <!-- <arg name="world_name" value="$(find drone_openai)/worlds/actor.world"/> -->
+        <!-- <arg name="world_name" value="$(find drone_openai)/worlds/walking_actor.world"/> -->
         <arg name="world_name" value="$(find drone_openai)/worlds/standing_person.world"/>
         <arg name="use_sim_time" value="true"/>
         <arg name="verbose" value="true"/>

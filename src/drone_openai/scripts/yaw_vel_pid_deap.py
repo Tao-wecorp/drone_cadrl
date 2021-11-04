@@ -19,6 +19,12 @@ import numpy as np
 import statistics
 import time
 
+from deap import algorithms
+from deap import base
+from deap import creator
+from deap import tools
+from deap import gp
+
 from helpers.cvlib import Detection
 detection = Detection()
 
@@ -33,12 +39,6 @@ pid_params = [0.4, 0, 0.5] # [0.4, 0.05, 0.4]
 
 from helpers.plot import Plot
 plot = Plot()
-
-# genetic algorithm
-PIDMAT = np.array([[0.5,0,0.5],[0.4,0,0.5],[0.3,0,0.5],
-       [0.4,0,0.3],[0.4,0,0.4],
-       [0.3,0,0.3],[0.3,0,0.4],
-       [0.5,0,0.3],[0.5,0,0.4]])
 
 
 class Yaw(object):
